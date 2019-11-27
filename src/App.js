@@ -1,25 +1,56 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { useState, useEffect } from 'react';
+import io from 'socket.io-client';
 import './App.css';
 
+const serverAddress = 'http://localhost:8080';
+
 function App() {
+  const [name, setName] = useState('');
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    const socket = io(serverAddress);
+    setInterval(() => {
+      if (loaded) {
+        socket.emit('cursor', {
+          name: name,
+          sessionKey: window.localStorage.getItem('sessionKey')
+        });
+      }
+    }, 3000);
+  });
+
+  function joinGame(e) {
+    fetch(serverAddress + '/create_user', {
+      body: JSON.stringify({
+        name: name
+      }),
+      method: 'post',
+      cache: 'no-cache',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+      .then(response => response.json())
+      .then(json => {
+        if (json.success) {
+          localStorage.sessionKey = json.sessionKey;
+          setLoaded(true);
+        }
+      });
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <React.Fragment>
+      {loaded ? (
+        <div>Here is the game</div>
+      ) : (
+        <div>
+          <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="Enter your username" />
+          <button onClick={joinGame}>Join</button>
+        </div>
+      )}
+    </React.Fragment>
   );
 }
 
