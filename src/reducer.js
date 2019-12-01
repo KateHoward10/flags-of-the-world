@@ -1,7 +1,7 @@
 const reducer = (
   state = {
     name: null,
-    names: []
+    players: []
   },
   action
 ) => {
@@ -10,7 +10,7 @@ const reducer = (
       state = { ...state, name: action.name };
       break;
     case 'PUT_ALL_NAMES_TO_REDUCER':
-      state = { ...state, names: action.names };
+      state = { ...state, players: action.players };
       break;
     default:
       break;
