@@ -1,57 +1,52 @@
-import React, { useState, useEffect } from 'react';
-import io from 'socket.io-client';
-import './App.css';
+import React, { useState } from 'react';
+import { connect } from 'react-redux';
+import { sendNameToServer } from './socket';
 
-const serverAddress = 'http://localhost:8080';
+function App({ names, dispatch }) {
+  const [joined, setJoined] = useState(false);
+  const [name, setName] = useState(null);
 
-function App() {
-  const [name, setName] = useState('');
-  const [loaded, setLoaded] = useState(false);
-
-  useEffect(() => {
-    const socket = io(serverAddress);
-    setInterval(() => {
-      if (loaded) {
-        socket.emit('cursor', {
-          name: name,
-          sessionKey: window.localStorage.getItem('sessionKey')
-        });
-      }
-    }, 3000);
-  });
-
-  function joinGame(e) {
-    fetch(serverAddress + '/create_user', {
-      body: JSON.stringify({
-        name: name
-      }),
-      method: 'post',
-      cache: 'no-cache',
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    })
-      .then(response => response.json())
-      .then(json => {
-        if (json.success) {
-          localStorage.sessionKey = json.sessionKey;
-          setLoaded(true);
-        }
-      });
+  function submitName(e) {
+    e.preventDefault();
+    console.log(name);
+    dispatch({ type: 'SET_USERNAME', name });
+    sendNameToServer(name);
+    setJoined(true);
   }
 
   return (
-    <React.Fragment>
-      {loaded ? (
-        <div>Here is the game</div>
-      ) : (
-        <div>
-          <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="Enter your username" />
-          <button onClick={joinGame}>Join</button>
-        </div>
-      )}
-    </React.Fragment>
+    <div container justify="center">
+      <div style={{ textAlign: 'center' }} item xs={12}>
+        {joined ? (
+          <div>
+            Your username is <span style={{ color: 'red' }}>{name}</span>
+            <div style={{ padding: '10px' }}>
+              Other members:
+              {names.length <= 1 ? (
+                <div style={{ color: 'red' }}>No other members yet</div>
+              ) : (
+                names.map(member => (
+                  <div style={{ display: name === member && 'none' }} key={member}>
+                    {member}
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        ) : (
+          <form onSubmit={submitName}>
+            <input onChange={e => setName(e.target.value)} />
+            <button type="submit">Join</button>
+          </form>
+        )}
+      </div>
+    </div>
   );
 }
 
-export default App;
+const mapStateToProps = state => ({
+  name: state.name,
+  names: state.names
+});
+
+export default connect(mapStateToProps)(App);
