@@ -17,6 +17,10 @@ io.on('connection', socket => {
     socket.emit('SEND_NAMES_TO_CLIENTS', names);
   });
 
+  socket.on('SET_QUESTION', question => {
+    socket.broadcast.emit('SEND_QUESTION_TO_CLIENTS', question);
+  });
+
   socket.on('disconnect', () => {
     serverNames = serverNames.filter(data => data.socketId !== socket.id);
     names = serverNames.map(data => data.name);

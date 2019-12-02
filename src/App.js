@@ -1,19 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
-import { sendNameToServer } from './socket';
+import { sendNameToServer, sendQuestionToServer } from './socket';
 
-function App({ players, dispatch }) {
+function App({ players, dispatch, question }) {
   const [joined, setJoined] = useState(false);
   const [name, setName] = useState(null);
   const [countries, setCountries] = useState([]);
-  const [question, setQuestion] = useState('');
-  const [options, setOptions] = useState([]);
-  const [rightAnswer, setRightAnswer] = useState(null);
   const [score, setScore] = useState(0);
   const [questionsAsked, setQuestionsAsked] = useState(0);
   const inCharge = players.length && players[0].name === name;
   const endpoint = 'https://restcountries.eu/rest/v2/all';
   const questionTypes = ['capital', 'name', 'alpha2Code', 'flag'];
+  const { wording, options, rightAnswer } = question;
 
   function submitName(e) {
     e.preventDefault();
@@ -25,25 +23,26 @@ function App({ players, dispatch }) {
   function generateQuestion() {
     const randomCountry = countries[Math.floor(Math.random() * countries.length)];
     const questionType = questionTypes[Math.floor(Math.random() * questionTypes.length)];
-    setQuestion(
-      `${
-        questionType === 'capital'
-          ? `What is the capital of ${randomCountry.name}`
-          : questionType === 'name'
-          ? `Which country's capital is ${randomCountry.capital}`
-          : questionType === 'flag'
-          ? 'Which country’s flag is this'
-          : `What is the flag of ${randomCountry.name}`
-      }?`
-    );
+    const wording = `${
+      questionType === 'capital'
+        ? `What is the capital of ${randomCountry.name}`
+        : questionType === 'name'
+        ? `Which country's capital is ${randomCountry.capital}`
+        : questionType === 'flag'
+        ? 'Which country’s flag is this'
+        : `What is the flag of ${randomCountry.name}`
+    }?`;
     const property = questionType === 'flag' ? 'name' : questionType;
-    setRightAnswer(randomCountry[property]);
+    const rightAnswer = randomCountry[property];
     let optionsToSet = [randomCountry[property]];
     for (let i = 0; i < 3; i++) {
-      const filteredCountries = countries.filter(country => !options.includes(country[property]));
+      const filteredCountries = countries.filter(country => !optionsToSet.includes(country[property]));
       optionsToSet.push(filteredCountries[Math.floor(Math.random() * filteredCountries.length)][property]);
     }
-    setOptions(optionsToSet.sort(() => Math.random() - 0.5));
+    const options = optionsToSet.sort(() => Math.random() - 0.5);
+    const question = { wording, options, rightAnswer };
+    dispatch({ type: 'PUT_QUESTION_TO_REDUCER', question });
+    sendQuestionToServer(question);
   }
 
   function checkGuess(e) {
@@ -71,13 +70,25 @@ function App({ players, dispatch }) {
           <div>
             Your username is <span>{name}</span>
             <div>
-              Other members:
+              Other players:
               {players.length <= 1 ? (
-                <div>No other members yet</div>
+                <div>No other players yet</div>
               ) : (
-                players.map((member, index) => <div key={index}>{member.name}</div>)
+                players.map((player, index) => <div key={index}>{player.name}</div>)
               )}
             </div>
+            {wording && <p>{wording}</p>}
+            <div>
+              {options &&
+                options.map((option, index) => (
+                  <button key={index} value={option} onClick={checkGuess}>
+                    {option}
+                  </button>
+                ))}
+            </div>
+            <p>
+              Score: {score} / {questionsAsked}
+            </p>
           </div>
         ) : (
           <form onSubmit={submitName}>
@@ -86,24 +97,14 @@ function App({ players, dispatch }) {
           </form>
         )}
       </div>
-      <p>{question}</p>
-      <div>
-        {options.map((option, index) => (
-          <button key={index} value={option} onClick={checkGuess}>
-            {option}
-          </button>
-        ))}
-      </div>
-      <p>
-        Score: {score} / {questionsAsked}
-      </p>
     </div>
   );
 }
 
 const mapStateToProps = state => ({
   name: state.name,
-  players: state.players
+  players: state.players,
+  question: state.question
 });
 
 export default connect(mapStateToProps)(App);
