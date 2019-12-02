@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import { sendNameToServer, sendQuestionToServer } from './socket';
+import './App.css';
 
 function App({ players, dispatch, question }) {
   const [joined, setJoined] = useState(false);
@@ -60,7 +61,6 @@ function App({ players, dispatch, question }) {
           setCountries([...data.filter(country => country.name.length && country.capital.length && country.alpha2Code)])
         );
     }
-    if (countries.length) generateQuestion();
   }, [inCharge, countries]);
 
   return (
@@ -68,15 +68,13 @@ function App({ players, dispatch, question }) {
       <div>
         {joined ? (
           <div>
-            Your username is <span>{name}</span>
-            <div>
-              Other players:
-              {players.length <= 1 ? (
-                <div>No other players yet</div>
-              ) : (
-                players.map((player, index) => <div key={index}>{player.name}</div>)
-              )}
-            </div>
+            <p>Your username is {name}</p>
+            <p>
+              {players.length <= 1
+                ? 'No other players yet'
+                : `Other players: ${players.map(player => player.name).join(', ')}`}
+            </p>
+            {inCharge && countries.length && <button onClick={generateQuestion}>Start the game!</button>}
             {wording && <p>{wording}</p>}
             <div>
               {options &&

@@ -1,22 +1,70 @@
-.App {
-  text-align: center;
+p,
+button,
+input {
+  font-family: 'Helvetica Neue', Verdana, sans-serif;
+  font-size: 1rem;
 }
 
-.App-logo {
-  height: 40vmin;
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+body {
+  height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
+  text-align: center;
+  padding: 5vw;
+  background: linear-gradient(rgb(0, 255, 0), rgb(0, 0, 255));
+}
+
+input {
+  background-color: rgba(0, 0, 0, 50%);
+  border: none;
+  color: #fff;
+}
+
+button {
+  background-color: transparent;
+  border: 2px solid black;
+  padding: 5px;
+  margin: 5px;
+  border-radius: 5px;
+}
+
+.correct-answer {
+  background-color: green;
   color: white;
 }
 
-.App-link {
-  color: #09d3ac;
+.wrong-answer {
+  background-color: red;
+}
+
+input[type='radio'] {
+  display: none;
+}
+
+input[type='radio']:checked + label {
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+label {
+  color: blue;
+  margin: 5px;
+}
+
+.option-container {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: center;
+  justify-content: center;
+}
+
+.mark-container {
+  font-size: 1.5rem;
+}
+
+@media only screen and (max-width: 720px) {
+  .option-button {
+    width: 60vw;
+  }
 }
