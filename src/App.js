@@ -11,7 +11,7 @@ function App({ dispatch, score, players, question }) {
   const inCharge = players.length && players[0].name === name;
   const endpoint = 'https://restcountries.eu/rest/v2/all';
   const questionTypes = ['capital', 'name', 'alpha2Code', 'flag'];
-  const { wording, options, rightAnswer } = question;
+  const { questionType, wording, options, rightCountry } = question;
 
   function submitName(e) {
     e.preventDefault();
@@ -21,26 +21,25 @@ function App({ dispatch, score, players, question }) {
   }
 
   function generateQuestion() {
-    const randomCountry = countries[Math.floor(Math.random() * countries.length)];
+    const rightCountry = countries[Math.floor(Math.random() * countries.length)];
     const questionType = questionTypes[Math.floor(Math.random() * questionTypes.length)];
     const wording = `${
       questionType === 'capital'
-        ? `What is the capital of ${randomCountry.name}`
+        ? `What is the capital of ${rightCountry.name}`
         : questionType === 'name'
-        ? `Which country's capital is ${randomCountry.capital}`
+        ? `Which country's capital is ${rightCountry.capital}`
         : questionType === 'flag'
         ? 'Which country’s flag is this'
-        : `What is the flag of ${randomCountry.name}`
+        : `What is the flag of ${rightCountry.name}`
     }?`;
     const property = questionType === 'flag' ? 'name' : questionType;
-    const rightAnswer = randomCountry[property];
-    let optionsToSet = [randomCountry[property]];
+    let optionsToSet = [rightCountry[property]];
     for (let i = 0; i < 3; i++) {
       const filteredCountries = countries.filter(country => !optionsToSet.includes(country[property]));
       optionsToSet.push(filteredCountries[Math.floor(Math.random() * filteredCountries.length)][property]);
     }
     const options = optionsToSet.sort(() => Math.random() - 0.5);
-    const question = { wording, options, rightAnswer };
+    const question = { questionType, wording, options, rightCountry };
     dispatch({ type: 'PUT_QUESTION_TO_REDUCER', question });
     sendQuestionToServer(question);
   }
@@ -51,7 +50,7 @@ function App({ dispatch, score, players, question }) {
   }
 
   function checkGuess(e) {
-    if (e.target.value === rightAnswer) increaseScore();
+    if (e.target.value === rightCountry[questionType === 'flag' ? 'name' : questionType]) increaseScore();
     setQuestionsAsked(questionsAsked + 1);
   }
 
@@ -78,11 +77,18 @@ function App({ dispatch, score, players, question }) {
             </p>
             {Boolean(inCharge && countries.length) && <button onClick={generateQuestion}>Start the game!</button>}
             {wording && <p>{wording}</p>}
+            {questionType === 'flag' && (
+              <img src={`https://www.countryflags.io/${rightCountry.alpha2Code}/flat/64.png`} alt="Mystery flag" />
+            )}
             <div>
               {options &&
                 options.map((option, index) => (
                   <button key={index} value={option} onClick={checkGuess}>
-                    {option}
+                    {questionType === 'alpha2Code' ? (
+                      <img src={`https://www.countryflags.io/${option}/flat/64.png`} alt="Mystery flag" />
+                    ) : (
+                      option
+                    )}
                   </button>
                 ))}
             </div>
