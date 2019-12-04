@@ -11,8 +11,10 @@ const configureSocket = dispatch => {
   return socket;
 };
 
-export const sendNameToServer = name => socket.emit('SEND_NAME_TO_SERVER', name);
+export const sendNameToServer = player => socket.emit('SEND_NAME_TO_SERVER', player);
 
 export const sendQuestionToServer = question => socket.emit('SEND_QUESTION_TO_SERVER', question);
+
+export const sendIncreasedScoreToServer = name => socket.emit('SEND_INCREASED_SCORE_TO_SERVER', name);
 
 export default configureSocket;

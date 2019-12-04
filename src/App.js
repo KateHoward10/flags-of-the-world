@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
-import { sendNameToServer, sendQuestionToServer } from './socket';
+import { sendNameToServer, sendQuestionToServer, sendIncreasedScoreToServer } from './socket';
 import './App.css';
 
-function App({ players, dispatch, question }) {
+function App({ dispatch, score, players, question }) {
   const [joined, setJoined] = useState(false);
   const [name, setName] = useState(null);
   const [countries, setCountries] = useState([]);
-  const [score, setScore] = useState(0);
   const [questionsAsked, setQuestionsAsked] = useState(0);
   const inCharge = players.length && players[0].name === name;
   const endpoint = 'https://restcountries.eu/rest/v2/all';
@@ -17,7 +16,7 @@ function App({ players, dispatch, question }) {
   function submitName(e) {
     e.preventDefault();
     dispatch({ type: 'SET_USERNAME', name });
-    sendNameToServer({ name });
+    sendNameToServer({ name, score: 0 });
     setJoined(true);
   }
 
@@ -46,10 +45,13 @@ function App({ players, dispatch, question }) {
     sendQuestionToServer(question);
   }
 
+  function increaseScore() {
+    dispatch({ type: 'INCREASE_SCORE', name });
+    sendIncreasedScoreToServer(name);
+  }
+
   function checkGuess(e) {
-    if (e.target.value === rightAnswer) {
-      setScore(score + 1);
-    }
+    if (e.target.value === rightAnswer) increaseScore();
     setQuestionsAsked(questionsAsked + 1);
   }
 
@@ -72,9 +74,9 @@ function App({ players, dispatch, question }) {
             <p>
               {players.length <= 1
                 ? 'No other players yet'
-                : `Other players: ${players.map(player => player.name).join(', ')}`}
+                : `Other players: ${players.map(player => `${player.name}: ${player.score}`).join(', ')}`}
             </p>
-            {inCharge && countries.length && <button onClick={generateQuestion}>Start the game!</button>}
+            {Boolean(inCharge && countries.length) && <button onClick={generateQuestion}>Start the game!</button>}
             {wording && <p>{wording}</p>}
             <div>
               {options &&
@@ -100,7 +102,7 @@ function App({ players, dispatch, question }) {
 }
 
 const mapStateToProps = state => ({
-  name: state.name,
+  score: state.score,
   players: state.players,
   question: state.question
 });

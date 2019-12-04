@@ -6,7 +6,6 @@ const cors = require('cors');
 server.listen(8000, () => console.log('connected to port 8000!'));
 app.use(cors());
 
-let pot = 0;
 let names = [];
 let serverNames = [];
 io.on('connection', socket => {
@@ -19,6 +18,11 @@ io.on('connection', socket => {
 
   socket.on('SET_QUESTION', question => {
     socket.broadcast.emit('SEND_QUESTION_TO_CLIENTS', question);
+  });
+
+  socket.on('UPDATE_PLAYERS', players => {
+    socket.broadcast.emit('SEND_NAMES_TO_CLIENTS', players);
+    socket.emit('SEND_NAMES_TO_CLIENTS', players);
   });
 
   socket.on('disconnect', () => {
