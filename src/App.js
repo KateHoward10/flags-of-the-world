@@ -10,6 +10,7 @@ function App({ dispatch, score, players, question }) {
   const [countries, setCountries] = useState([]);
   const [questionsAsked, setQuestionsAsked] = useState(0);
   const [playing, togglePlaying] = useState(false);
+  const [time, setTime] = useState(null);
   const inCharge = players.length && players[0].name === name;
   const endpoint = 'https://restcountries.eu/rest/v2/all';
   const questionTypes = ['capital', 'name', 'alpha2Code', 'flag'];
@@ -60,8 +61,19 @@ function App({ dispatch, score, players, question }) {
     () => {
       if (inCharge && countries.length) generateQuestion();
     },
-    playing ? 5000 : null
+    playing ? 10000 : null
   );
+
+  useInterval(
+    () => {
+      setTime(time - 1);
+    },
+    question.wording && time > 1 ? 1000 : null
+  );
+
+  useEffect(() => {
+    if (question.wording) setTime(10);
+  }, [question]);
 
   useEffect(() => {
     if (inCharge && !countries.length) {
@@ -87,6 +99,7 @@ function App({ dispatch, score, players, question }) {
             {Boolean(inCharge && countries.length && !playing) && (
               <button onClick={() => togglePlaying(true)}>Start the game!</button>
             )}
+            {time && <p>Time remaining: {time}</p>}
             {wording && <p>{wording}</p>}
             {questionType === 'flag' && (
               <img src={`https://www.countryflags.io/${rightCountry.alpha2Code}/flat/64.png`} alt="Mystery flag" />
