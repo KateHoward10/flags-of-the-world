@@ -2,7 +2,6 @@ import { socket } from './index';
 
 const reducer = (
   state = {
-    name: null,
     score: 0,
     players: [],
     question: {}
@@ -10,9 +9,6 @@ const reducer = (
   action
 ) => {
   switch (action.type) {
-    case 'SET_USERNAME':
-      state = { ...state, name: action.name };
-      break;
     case 'INCREASE_SCORE':
       state = {
         ...state,

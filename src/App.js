@@ -12,6 +12,7 @@ function App({ dispatch, score, players, question }) {
   const [playing, togglePlaying] = useState(false);
   const [time, setTime] = useState(null);
   const [guess, setGuess] = useState(null);
+  const [winners, setWinners] = useState([]);
   const inCharge = players.length && players[0].name === name;
   const endpoint = 'https://restcountries.eu/rest/v2/all';
   const questionTypes = ['capital', 'name', 'alpha2Code', 'flag'];
@@ -23,10 +24,14 @@ function App({ dispatch, score, players, question }) {
     if (players.find(player => player.name === name)) {
       alert('That name is already taken, sorry');
     } else {
-      dispatch({ type: 'SET_USERNAME', name });
       sendNameToServer({ name, score: 0 });
       setJoined(true);
     }
+  }
+
+  function startGame() {
+    generateQuestion();
+    togglePlaying(true);
   }
 
   function generateQuestion() {
@@ -65,13 +70,17 @@ function App({ dispatch, score, players, question }) {
     }
   }
 
+  // Set new question every ten seconds during game
   useInterval(
     () => {
-      if (inCharge && countries.length) generateQuestion();
+      if (inCharge && countries.length && questionsAsked < 10) {
+        generateQuestion();
+      }
     },
     playing ? 10000 : null
   );
 
+  // Count down each question
   useInterval(
     () => {
       setTime(time - 1);
@@ -79,14 +88,26 @@ function App({ dispatch, score, players, question }) {
     question.wording && time > 1 ? 1000 : null
   );
 
+  // Update stuff when new question is set
   useEffect(() => {
     if (question.wording) {
       setTime(10);
       setGuess(null);
-      setQuestionsAsked(questionsAsked + 1);
+      setQuestionsAsked(q => q + 1);
+      if (!playing) togglePlaying(true);
     }
-  }, [question]);
+  }, [question, playing]);
 
+  // Find winner(s) if game ended
+  useEffect(() => {
+    if (questionsAsked >= 10) {
+      togglePlaying(false);
+      const highScore = Math.max(...players.map(player => player.score));
+      setWinners(players.filter(player => player.score === highScore));
+    }
+  }, [questionsAsked, players]);
+
+  // If first player, get country data
   useEffect(() => {
     if (inCharge && !countries.length) {
       fetch(endpoint)
@@ -111,47 +132,47 @@ function App({ dispatch, score, players, question }) {
                     .map(player => `${player.name}: ${player.score}`)
                     .join(', ')}`}
             </p>
-            {Boolean(inCharge && countries.length && !playing) && (
-              <button
-                onClick={() => {
-                  generateQuestion();
-                  togglePlaying(true);
-                }}
-              >
-                Start the game!
-              </button>
+            {Boolean(!playing && winners.length) && (
+              <h3>
+                The winner{winners.length > 1 ? 's are' : ' is'} {winners.map(winner => winner.name).join(' and ')}!
+              </h3>
             )}
+            {Boolean(inCharge && countries.length && !playing) && <button onClick={startGame}>Start the game!</button>}
             {players.length && !inCharge && !question.wording && (
               <p>Waiting for {players[0].name} to start the game...</p>
             )}
-            {time && (
-              <div className="time-container">
-                <div style={{ height: '5px', width: `${time * 10}%`, background: 'blue' }} />
+            {playing && (
+              <div>
+                {time && (
+                  <div className="time-container">
+                    <div style={{ height: '5px', width: `${time * 10}%`, background: 'blue' }} />
+                  </div>
+                )}
+                {wording && <p>{wording}</p>}
+                {questionType === 'flag' && (
+                  <img src={`https://www.countryflags.io/${rightCountry.alpha2Code}/flat/64.png`} alt="Mystery flag" />
+                )}
+                <div>
+                  {options &&
+                    options.map((option, index) => (
+                      <button
+                        key={index}
+                        value={option}
+                        onClick={checkGuess}
+                        className={
+                          guess && option === rightAnswer ? 'correct-answer' : guess === option ? 'wrong-answer' : ''
+                        }
+                      >
+                        {questionType === 'alpha2Code' ? (
+                          <img src={`https://www.countryflags.io/${option}/flat/64.png`} alt="Mystery flag" />
+                        ) : (
+                          option
+                        )}
+                      </button>
+                    ))}
+                </div>
               </div>
             )}
-            {wording && <p>{wording}</p>}
-            {questionType === 'flag' && (
-              <img src={`https://www.countryflags.io/${rightCountry.alpha2Code}/flat/64.png`} alt="Mystery flag" />
-            )}
-            <div>
-              {options &&
-                options.map((option, index) => (
-                  <button
-                    key={index}
-                    value={option}
-                    onClick={checkGuess}
-                    className={
-                      guess && option === rightAnswer ? 'correct-answer' : guess === option ? 'wrong-answer' : ''
-                    }
-                  >
-                    {questionType === 'alpha2Code' ? (
-                      <img src={`https://www.countryflags.io/${option}/flat/64.png`} alt="Mystery flag" />
-                    ) : (
-                      option
-                    )}
-                  </button>
-                ))}
-            </div>
             <p>
               Score: {score} / {questionsAsked}
             </p>

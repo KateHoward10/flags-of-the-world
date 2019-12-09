@@ -6,12 +6,12 @@ body {
   text-align: center;
   padding: 5vw;
   background: linear-gradient(rgb(0, 255, 0), rgb(0, 0, 255));
+  font-family: 'Helvetica Neue', Verdana, sans-serif;
 }
 
 p,
 button,
 input {
-  font-family: 'Helvetica Neue', Verdana, sans-serif;
   font-size: 1rem;
 }
 
