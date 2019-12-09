@@ -30,7 +30,6 @@ const reducer = (
       break;
     case 'PUT_QUESTION_TO_REDUCER':
       state = { ...state, question: action.question };
-      socket && socket.emit('SET_QUESTION', state.question);
       break;
     default:
       break;

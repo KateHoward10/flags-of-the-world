@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import useInterval from './useInterval';
 import { connect } from 'react-redux';
-import { sendNameToServer, sendQuestionToServer, sendIncreasedScoreToServer } from './socket';
+import { sendNameToServer, sendQuestionToServer } from './socket';
 import './App.css';
 
 function App({ dispatch, score, players, question }) {
@@ -8,6 +9,7 @@ function App({ dispatch, score, players, question }) {
   const [name, setName] = useState(null);
   const [countries, setCountries] = useState([]);
   const [questionsAsked, setQuestionsAsked] = useState(0);
+  const [playing, togglePlaying] = useState(false);
   const inCharge = players.length && players[0].name === name;
   const endpoint = 'https://restcountries.eu/rest/v2/all';
   const questionTypes = ['capital', 'name', 'alpha2Code', 'flag'];
@@ -46,13 +48,20 @@ function App({ dispatch, score, players, question }) {
 
   function increaseScore() {
     dispatch({ type: 'INCREASE_SCORE', name });
-    sendIncreasedScoreToServer(name);
   }
 
   function checkGuess(e) {
+    e.preventDefault();
     if (e.target.value === rightCountry[questionType === 'flag' ? 'name' : questionType]) increaseScore();
     setQuestionsAsked(questionsAsked + 1);
   }
+
+  useInterval(
+    () => {
+      if (inCharge && countries.length) generateQuestion();
+    },
+    playing ? 5000 : null
+  );
 
   useEffect(() => {
     if (inCharge && !countries.length) {
@@ -75,7 +84,9 @@ function App({ dispatch, score, players, question }) {
                 ? 'No other players yet'
                 : `Other players: ${players.map(player => `${player.name}: ${player.score}`).join(', ')}`}
             </p>
-            {Boolean(inCharge && countries.length) && <button onClick={generateQuestion}>Start the game!</button>}
+            {Boolean(inCharge && countries.length && !playing) && (
+              <button onClick={() => togglePlaying(true)}>Start the game!</button>
+            )}
             {wording && <p>{wording}</p>}
             {questionType === 'flag' && (
               <img src={`https://www.countryflags.io/${rightCountry.alpha2Code}/flat/64.png`} alt="Mystery flag" />
