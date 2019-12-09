@@ -106,7 +106,10 @@ function App({ dispatch, score, players, question }) {
             <p>
               {players.length <= 1
                 ? 'No other players yet'
-                : `Other players: ${players.map(player => `${player.name}: ${player.score}`).join(', ')}`}
+                : `Other players: ${players
+                    .filter(player => player.name !== name)
+                    .map(player => `${player.name}: ${player.score}`)
+                    .join(', ')}`}
             </p>
             {Boolean(inCharge && countries.length && !playing) && (
               <button
@@ -117,6 +120,9 @@ function App({ dispatch, score, players, question }) {
               >
                 Start the game!
               </button>
+            )}
+            {players.length && !inCharge && !question.wording && (
+              <p>Waiting for {players[0].name} to start the game...</p>
             )}
             {time && (
               <div className="time-container">
