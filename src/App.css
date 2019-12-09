@@ -63,8 +63,10 @@ label {
   justify-content: center;
 }
 
-.mark-container {
-  font-size: 1.5rem;
+.time-container {
+  height: 5px;
+  width: 60vw;
+  border: 1px solid black;
 }
 
 @media only screen and (max-width: 720px) {

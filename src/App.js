@@ -97,9 +97,20 @@ function App({ dispatch, score, players, question }) {
                 : `Other players: ${players.map(player => `${player.name}: ${player.score}`).join(', ')}`}
             </p>
             {Boolean(inCharge && countries.length && !playing) && (
-              <button onClick={() => togglePlaying(true)}>Start the game!</button>
+              <button
+                onClick={() => {
+                  generateQuestion();
+                  togglePlaying(true);
+                }}
+              >
+                Start the game!
+              </button>
             )}
-            {time && <p>Time remaining: {time}</p>}
+            {time && (
+              <div className="time-container">
+                <div style={{ height: '5px', width: `${time * 10}%`, background: 'blue' }} />
+              </div>
+            )}
             {wording && <p>{wording}</p>}
             {questionType === 'flag' && (
               <img src={`https://www.countryflags.io/${rightCountry.alpha2Code}/flat/64.png`} alt="Mystery flag" />
