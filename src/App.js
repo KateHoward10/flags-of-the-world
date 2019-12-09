@@ -20,9 +20,13 @@ function App({ dispatch, score, players, question }) {
 
   function submitName(e) {
     e.preventDefault();
-    dispatch({ type: 'SET_USERNAME', name });
-    sendNameToServer({ name, score: 0 });
-    setJoined(true);
+    if (players.find(player => player.name === name)) {
+      alert('That name is already taken, sorry');
+    } else {
+      dispatch({ type: 'SET_USERNAME', name });
+      sendNameToServer({ name, score: 0 });
+      setJoined(true);
+    }
   }
 
   function generateQuestion() {
@@ -131,11 +135,7 @@ function App({ dispatch, score, players, question }) {
                     value={option}
                     onClick={checkGuess}
                     className={
-                      guess === option && guess === rightAnswer
-                        ? 'correct-answer'
-                        : guess === option
-                        ? 'wrong-answer'
-                        : ''
+                      guess && option === rightAnswer ? 'correct-answer' : guess === option ? 'wrong-answer' : ''
                     }
                   >
                     {questionType === 'alpha2Code' ? (
