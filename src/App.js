@@ -11,10 +11,12 @@ function App({ dispatch, score, players, question }) {
   const [questionsAsked, setQuestionsAsked] = useState(0);
   const [playing, togglePlaying] = useState(false);
   const [time, setTime] = useState(null);
+  const [guess, setGuess] = useState(null);
   const inCharge = players.length && players[0].name === name;
   const endpoint = 'https://restcountries.eu/rest/v2/all';
   const questionTypes = ['capital', 'name', 'alpha2Code', 'flag'];
   const { questionType, wording, options, rightCountry } = question;
+  const rightAnswer = rightCountry ? rightCountry[questionType === 'flag' ? 'name' : questionType] : null;
 
   function submitName(e) {
     e.preventDefault();
@@ -47,14 +49,16 @@ function App({ dispatch, score, players, question }) {
     sendQuestionToServer(question);
   }
 
-  function increaseScore() {
-    dispatch({ type: 'INCREASE_SCORE', name });
-  }
-
   function checkGuess(e) {
-    e.preventDefault();
-    if (e.target.value === rightCountry[questionType === 'flag' ? 'name' : questionType]) increaseScore();
-    setQuestionsAsked(questionsAsked + 1);
+    if (!guess) {
+      setGuess(e.target.value);
+      if (e.target.value === rightAnswer) {
+        dispatch({ type: 'INCREASE_SCORE', name });
+        e.target.classList.add('correct-answer');
+      } else {
+        e.target.classList.add('wrong-answer');
+      }
+    }
   }
 
   useInterval(
@@ -72,7 +76,11 @@ function App({ dispatch, score, players, question }) {
   );
 
   useEffect(() => {
-    if (question.wording) setTime(10);
+    if (question.wording) {
+      setTime(10);
+      setGuess(null);
+      setQuestionsAsked(questionsAsked + 1);
+    }
   }, [question]);
 
   useEffect(() => {
@@ -118,7 +126,18 @@ function App({ dispatch, score, players, question }) {
             <div>
               {options &&
                 options.map((option, index) => (
-                  <button key={index} value={option} onClick={checkGuess}>
+                  <button
+                    key={index}
+                    value={option}
+                    onClick={checkGuess}
+                    className={
+                      guess === option && guess === rightAnswer
+                        ? 'correct-answer'
+                        : guess === option
+                        ? 'wrong-answer'
+                        : ''
+                    }
+                  >
                     {questionType === 'alpha2Code' ? (
                       <img src={`https://www.countryflags.io/${option}/flat/64.png`} alt="Mystery flag" />
                     ) : (

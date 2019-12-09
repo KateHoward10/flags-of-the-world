@@ -1,3 +1,13 @@
+body {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 5vw;
+  background: linear-gradient(rgb(0, 255, 0), rgb(0, 0, 255));
+}
+
 p,
 button,
 input {
@@ -7,16 +17,6 @@ input {
 
 button > * {
   pointer-events: none;
-}
-
-body {
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  padding: 5vw;
-  background: linear-gradient(rgb(0, 255, 0), rgb(0, 0, 255));
 }
 
 input {
@@ -40,20 +40,6 @@ button {
 
 .wrong-answer {
   background-color: red;
-}
-
-input[type='radio'] {
-  display: none;
-}
-
-input[type='radio']:checked + label {
-  font-weight: bold;
-  text-decoration: underline;
-}
-
-label {
-  color: blue;
-  margin: 5px;
 }
 
 .option-container {
