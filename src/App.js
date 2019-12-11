@@ -129,7 +129,7 @@ function App({ dispatch, score, players, question }) {
                 ? 'No other players yet'
                 : `Other players: ${players
                     .filter(player => player.name !== name)
-                    .map(player => `${player.name}: ${player.score}`)
+                    .map(player => player.name)
                     .join(', ')}`}
             </p>
             {Boolean(!playing && winners.length) && (
