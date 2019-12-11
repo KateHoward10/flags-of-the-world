@@ -25,6 +25,11 @@ input {
   color: #fff;
 }
 
+.quiz-setup {
+  display: flex;
+  flex-direction: column;
+}
+
 button {
   background-color: transparent;
   border: 2px solid black;

@@ -8,6 +8,7 @@ function App({ dispatch, score, players, question }) {
   const [joined, setJoined] = useState(false);
   const [name, setName] = useState(null);
   const [countries, setCountries] = useState([]);
+  const [numberOfQuestions, setNumberOfQuestions] = useState(10);
   const [questionsAsked, setQuestionsAsked] = useState(0);
   const [playing, togglePlaying] = useState(false);
   const [time, setTime] = useState(null);
@@ -27,6 +28,11 @@ function App({ dispatch, score, players, question }) {
       sendNameToServer({ name, score: 0 });
       setJoined(true);
     }
+  }
+
+  function setNumber(e) {
+    e.preventDefault();
+    setNumberOfQuestions(parseInt(e.target.value));
   }
 
   function startGame() {
@@ -73,11 +79,11 @@ function App({ dispatch, score, players, question }) {
   // Set new question every ten seconds during game
   useInterval(
     () => {
-      if (inCharge && countries.length && questionsAsked < 10) {
+      if (inCharge && countries.length && questionsAsked < numberOfQuestions) {
         generateQuestion();
       }
     },
-    playing ? 10000 : null
+    playing ? numberOfQuestions * 1000 : null
   );
 
   // Count down each question
@@ -100,7 +106,7 @@ function App({ dispatch, score, players, question }) {
 
   // Find winner(s) if game ended
   useEffect(() => {
-    if (questionsAsked >= 10) {
+    if (questionsAsked >= numberOfQuestions) {
       togglePlaying(false);
       const highScore = Math.max(...players.map(player => player.score));
       setWinners(players.filter(player => player.score === highScore));
@@ -137,8 +143,16 @@ function App({ dispatch, score, players, question }) {
                 The winner{winners.length > 1 ? 's are' : ' is'} {winners.map(winner => winner.name).join(' and ')}!
               </h3>
             )}
-            {Boolean(inCharge && countries.length && !playing) && <button onClick={startGame}>Start the game!</button>}
-            {players.length && !inCharge && !question.wording && (
+            {Boolean(inCharge && countries.length && !playing) && (
+              <React.Fragment>
+                <div className="quiz-setup">
+                  <label for="questions">Number of questions in the quiz: {numberOfQuestions}</label>
+                  <input type="range" min="5" max="50" value={numberOfQuestions} id="questions" onChange={setNumber} />
+                </div>
+                <button onClick={startGame}>Start the game!</button>
+              </React.Fragment>
+            )}
+            {Boolean(players.length && !inCharge && !question.wording) && (
               <p>Waiting for {players[0].name} to start the game...</p>
             )}
             {playing && (
