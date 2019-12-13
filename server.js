@@ -1,4 +1,5 @@
-const app = require('express')();
+const express = require('express');
+const app = express();
 const server = require('http').Server(app);
 const io = require('socket.io')(server);
 const path = require('path');
@@ -16,7 +17,7 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname + '/client/public/index.html'));
 });
 
-server.listen(PORT, () => console.log(`connected to port ${PORT}!`));
+server.listen(port, () => console.log(`connected to port ${port}!`));
 
 let names = [];
 let serverNames = [];

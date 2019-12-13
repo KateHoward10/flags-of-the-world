@@ -111,7 +111,7 @@ function App({ dispatch, score, players, question }) {
       const highScore = Math.max(...players.map(player => player.score));
       setWinners(players.filter(player => player.score === highScore));
     }
-  }, [questionsAsked, players]);
+  }, [questionsAsked, players, numberOfQuestions]);
 
   // If first player, get country data
   useEffect(() => {
