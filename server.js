@@ -1,10 +1,22 @@
 const app = require('express')();
 const server = require('http').Server(app);
 const io = require('socket.io')(server);
-const cors = require('cors');
+const path = require('path');
+const port = process.env.PORT || 8000;
 
-server.listen(8000, () => console.log('connected to port 8000!'));
-app.use(cors());
+app.use(express.static(path.join(__dirname, 'client/build')));
+
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(path.join(__dirname, 'client/build')));
+  app.get('*', (req, res) => {
+    res.sendfile(path.join((__dirname = 'client/build/index.html')));
+  });
+}
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname + '/client/public/index.html'));
+});
+
+server.listen(PORT, () => console.log(`connected to port ${PORT}!`));
 
 let names = [];
 let serverNames = [];
