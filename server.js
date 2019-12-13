@@ -5,6 +5,7 @@ const io = require('socket.io')(server);
 const path = require('path');
 const port = process.env.PORT || 8000;
 
+console.log(path);
 app.use(express.static(path.join(__dirname, 'build')));
 
 if (process.env.NODE_ENV === 'production') {
