@@ -95,6 +95,14 @@ function App({ dispatch, score, players, question, numberOfQuestions }) {
     question.wording && time > 1 ? 1000 : null
   );
 
+  // Reset when new game starts
+  useEffect(() => {
+    if (playing) {
+      setGuess(null);
+      setWinners([]);
+    }
+  }, [playing]);
+
   // Update stuff when new question is set
   useEffect(() => {
     if (question.wording) {
@@ -110,6 +118,7 @@ function App({ dispatch, score, players, question, numberOfQuestions }) {
     if (questionsAsked >= numberOfQuestions) {
       togglePlaying(false);
       setTime(null);
+      setQuestionsAsked(0);
       setWinners([]);
       const highScore = Math.max(...players.map(player => player.score));
       setWinners(players.filter(player => player.score === highScore));
