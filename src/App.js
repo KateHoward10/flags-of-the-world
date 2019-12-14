@@ -126,78 +126,76 @@ function App({ dispatch, score, players, question }) {
 
   return (
     <div>
-      <div>
-        {joined ? (
-          <div>
-            <p>Your username is {name}</p>
-            <p>
-              {players.length <= 1
-                ? 'No other players yet'
-                : `Other players: ${players
-                    .filter(player => player.name !== name)
-                    .map(player => player.name)
-                    .join(', ')}`}
-            </p>
-            {Boolean(!playing && winners.length) && (
-              <h3>
-                The winner{winners.length > 1 ? 's are' : ' is'} {winners.map(winner => winner.name).join(' and ')}!
-              </h3>
-            )}
-            {Boolean(inCharge && countries.length && !playing) && (
-              <React.Fragment>
-                <div className="quiz-setup">
-                  <label for="questions">Number of questions in the quiz: {numberOfQuestions}</label>
-                  <input type="range" min="5" max="50" value={numberOfQuestions} id="questions" onChange={setNumber} />
-                </div>
-                <button onClick={startGame}>Start the game!</button>
-              </React.Fragment>
-            )}
-            {Boolean(players.length && !inCharge && !question.wording) && (
-              <p>Waiting for {players[0].name} to start the game...</p>
-            )}
-            {playing && (
-              <div>
-                {time && (
-                  <div className="time-container">
-                    <div style={{ height: '5px', width: `${time * 10}%`, background: 'blue' }} />
-                  </div>
-                )}
-                {wording && <p>{wording}</p>}
-                {questionType === 'flag' && (
-                  <img src={`https://www.countryflags.io/${rightCountry.alpha2Code}/flat/64.png`} alt="Mystery flag" />
-                )}
-                <div>
-                  {options &&
-                    options.map((option, index) => (
-                      <button
-                        key={index}
-                        value={option}
-                        onClick={checkGuess}
-                        className={
-                          guess && option === rightAnswer ? 'correct-answer' : guess === option ? 'wrong-answer' : ''
-                        }
-                      >
-                        {questionType === 'alpha2Code' ? (
-                          <img src={`https://www.countryflags.io/${option}/flat/64.png`} alt="Mystery flag" />
-                        ) : (
-                          option
-                        )}
-                      </button>
-                    ))}
-                </div>
+      {joined ? (
+        <React.Fragment>
+          <p>Your username is {name}</p>
+          <p>
+            {players.length <= 1
+              ? 'No other players yet'
+              : `Other players: ${players
+                  .filter(player => player.name !== name)
+                  .map(player => player.name)
+                  .join(', ')}`}
+          </p>
+          {Boolean(!playing && winners.length) && (
+            <h3>
+              The winner{winners.length > 1 ? 's are' : ' is'} {winners.map(winner => winner.name).join(' and ')}!
+            </h3>
+          )}
+          {Boolean(inCharge && countries.length && !playing) && (
+            <React.Fragment>
+              <div className="quiz-setup">
+                <label for="questions">Number of questions in the quiz: {numberOfQuestions}</label>
+                <input type="range" min="5" max="50" value={numberOfQuestions} id="questions" onChange={setNumber} />
               </div>
-            )}
-            <p>
-              Score: {score} / {questionsAsked}
-            </p>
-          </div>
-        ) : (
-          <form onSubmit={submitName}>
-            <input onChange={e => setName(e.target.value)} />
-            <button type="submit">Join</button>
-          </form>
-        )}
-      </div>
+              <button onClick={startGame}>Start the game!</button>
+            </React.Fragment>
+          )}
+          {Boolean(players.length && !inCharge && !question.wording) && (
+            <p>Waiting for {players[0].name} to start the game...</p>
+          )}
+          {playing && (
+            <div className="question">
+              {time && (
+                <div className="time-container">
+                  <div style={{ height: '5px', width: `${time * 10}%`, background: 'blue' }} />
+                </div>
+              )}
+              {wording && <p>{wording}</p>}
+              {questionType === 'flag' && (
+                <img src={`https://www.countryflags.io/${rightCountry.alpha2Code}/flat/64.png`} alt="Mystery flag" />
+              )}
+              <div>
+                {options &&
+                  options.map((option, index) => (
+                    <button
+                      key={index}
+                      value={option}
+                      onClick={checkGuess}
+                      className={
+                        guess && option === rightAnswer ? 'correct-answer' : guess === option ? 'wrong-answer' : ''
+                      }
+                    >
+                      {questionType === 'alpha2Code' ? (
+                        <img src={`https://www.countryflags.io/${option}/flat/64.png`} alt="Mystery flag" />
+                      ) : (
+                        option
+                      )}
+                    </button>
+                  ))}
+              </div>
+            </div>
+          )}
+          <p>
+            Score: {score} / {questionsAsked}
+          </p>
+        </React.Fragment>
+      ) : (
+        <form onSubmit={submitName}>
+          <input onChange={e => setName(e.target.value)} />
+          <button type="submit">Join</button>
+        </form>
+      )}
     </div>
   );
 }
