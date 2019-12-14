@@ -4,7 +4,8 @@ const reducer = (
   state = {
     score: 0,
     players: [],
-    question: {}
+    question: {},
+    numberOfQuestions: 10
   },
   action
 ) => {
@@ -26,6 +27,9 @@ const reducer = (
       break;
     case 'PUT_QUESTION_TO_REDUCER':
       state = { ...state, question: action.question };
+      break;
+    case 'PUT_NUMBER_TO_REDUCER':
+      state = { ...state, numberOfQuestions: action.numberOfQuestions };
       break;
     default:
       break;

@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import useInterval from './useInterval';
 import { connect } from 'react-redux';
-import { sendNameToServer, sendQuestionToServer } from './socket';
+import { sendNameToServer, sendQuestionToServer, sendNumberToServer } from './socket';
 import './App.css';
 
-function App({ dispatch, score, players, question }) {
+function App({ dispatch, score, players, question, numberOfQuestions }) {
   const [joined, setJoined] = useState(false);
   const [name, setName] = useState(null);
   const [countries, setCountries] = useState([]);
-  const [numberOfQuestions, setNumberOfQuestions] = useState(10);
   const [questionsAsked, setQuestionsAsked] = useState(0);
   const [playing, togglePlaying] = useState(false);
   const [time, setTime] = useState(null);
@@ -30,14 +29,16 @@ function App({ dispatch, score, players, question }) {
     }
   }
 
-  function setNumber(e) {
-    e.preventDefault();
-    setNumberOfQuestions(parseInt(e.target.value));
-  }
-
   function startGame() {
     generateQuestion();
     togglePlaying(true);
+  }
+
+  function setNumber(e) {
+    e.preventDefault();
+    const numberOfQuestions = parseInt(e.target.value);
+    dispatch({ type: 'PUT_NUMBER_TO_REDUCER', numberOfQuestions });
+    sendNumberToServer(numberOfQuestions);
   }
 
   function generateQuestion() {
@@ -83,7 +84,7 @@ function App({ dispatch, score, players, question }) {
         generateQuestion();
       }
     },
-    playing ? numberOfQuestions * 1000 : null
+    playing ? 10000 : null
   );
 
   // Count down each question
@@ -108,6 +109,8 @@ function App({ dispatch, score, players, question }) {
   useEffect(() => {
     if (questionsAsked >= numberOfQuestions) {
       togglePlaying(false);
+      setTime(null);
+      setWinners([]);
       const highScore = Math.max(...players.map(player => player.score));
       setWinners(players.filter(player => player.score === highScore));
     }
@@ -186,9 +189,7 @@ function App({ dispatch, score, players, question }) {
               </div>
             </div>
           )}
-          <p>
-            Score: {score} / {questionsAsked}
-          </p>
+          <p>{playing ? `Score: ${score} / ${questionsAsked}` : `Your score: ${score}`}</p>
         </React.Fragment>
       ) : (
         <form onSubmit={submitName}>
@@ -203,7 +204,8 @@ function App({ dispatch, score, players, question }) {
 const mapStateToProps = state => ({
   score: state.score,
   players: state.players,
-  question: state.question
+  question: state.question,
+  numberOfQuestions: state.numberOfQuestions
 });
 
 export default connect(mapStateToProps)(App);

@@ -5,7 +5,6 @@ const io = require('socket.io')(server);
 const path = require('path');
 const port = process.env.PORT || 8000;
 
-console.log(path);
 app.use(express.static(path.join(__dirname, 'build')));
 
 if (process.env.NODE_ENV === 'production') {
@@ -32,6 +31,10 @@ io.on('connection', socket => {
 
   socket.on('SET_QUESTION', question => {
     socket.broadcast.emit('SEND_QUESTION_TO_CLIENTS', question);
+  });
+
+  socket.on('SET_NUMBER', numberOfQuestions => {
+    socket.broadcast.emit('SEND_NUMBER_TO_CLIENTS', numberOfQuestions);
   });
 
   socket.on('UPDATE_PLAYERS', players => {
