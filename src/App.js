@@ -100,10 +100,10 @@ function App({ dispatch, score, players, question, numberOfQuestions }) {
     if (question.wording) {
       setTime(10);
       setGuess(null);
+      togglePlaying(true);
       setQuestionsAsked(q => q + 1);
-      if (!playing) togglePlaying(true);
     }
-  }, [question, playing]);
+  }, [question]);
 
   // Find winner(s) if game ended
   useEffect(() => {
