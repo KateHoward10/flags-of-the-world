@@ -31,6 +31,7 @@ function App({ dispatch, score, players, question, numberOfQuestions }) {
 
   function startGame() {
     generateQuestion();
+    setQuestionsAsked(0);
     togglePlaying(true);
   }
 
@@ -118,7 +119,6 @@ function App({ dispatch, score, players, question, numberOfQuestions }) {
     if (questionsAsked >= numberOfQuestions) {
       togglePlaying(false);
       setTime(null);
-      setQuestionsAsked(0);
       setWinners([]);
       const highScore = Math.max(...players.map(player => player.score));
       setWinners(players.filter(player => player.score === highScore));
@@ -154,6 +154,7 @@ function App({ dispatch, score, players, question, numberOfQuestions }) {
               The winner{winners.length > 1 ? 's are' : ' is'} {winners.map(winner => winner.name).join(' and ')}!
             </h3>
           )}
+          {!playing && <p>You will have ten seconds to answer each question</p>}
           {Boolean(inCharge && countries.length && !playing) && (
             <React.Fragment>
               <div className="quiz-setup">
@@ -198,11 +199,13 @@ function App({ dispatch, score, players, question, numberOfQuestions }) {
               </div>
             </div>
           )}
-          <p>{playing ? `Score: ${score} / ${questionsAsked}` : `Your score: ${score}`}</p>
+          <p>
+            Your score: {score} / {questionsAsked}
+          </p>
         </React.Fragment>
       ) : (
         <form onSubmit={submitName}>
-          <input onChange={e => setName(e.target.value)} />
+          <input onChange={e => setName(e.target.value)} placeholder="Username" />
           <button type="submit">Join</button>
         </form>
       )}
