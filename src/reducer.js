@@ -5,7 +5,8 @@ const reducer = (
     score: 0,
     players: [],
     question: {},
-    numberOfQuestions: 10
+    numberOfQuestions: 10,
+    questionsAsked: 0
   },
   action
 ) => {
@@ -22,6 +23,16 @@ const reducer = (
       };
       socket && socket.emit('UPDATE_PLAYERS', state.players);
       break;
+    case 'RESET_SCORES':
+      state = {
+        ...state,
+        score: 0,
+        players: state.players.map(player => {
+          return { ...player, score: 0 };
+        })
+      };
+      socket && socket.emit('UPDATE_PLAYERS', state.players);
+      break;
     case 'PUT_ALL_NAMES_TO_REDUCER':
       state = { ...state, players: action.players };
       break;
@@ -30,6 +41,9 @@ const reducer = (
       break;
     case 'PUT_NUMBER_TO_REDUCER':
       state = { ...state, numberOfQuestions: action.numberOfQuestions };
+      break;
+    case 'PUT_TOTAL_TO_REDUCER':
+      state = { ...state, questionsAsked: action.questionsAsked };
       break;
     default:
       break;

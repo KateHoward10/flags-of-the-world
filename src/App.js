@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import useInterval from './useInterval';
 import { connect } from 'react-redux';
-import { sendNameToServer, sendQuestionToServer, sendNumberToServer } from './socket';
+import { sendNameToServer, sendQuestionToServer, sendNumberToServer, sendTotalToServer } from './socket';
 import './App.css';
 
-function App({ dispatch, score, players, question, numberOfQuestions }) {
+function App({ dispatch, score, players, question, numberOfQuestions, questionsAsked }) {
   const [joined, setJoined] = useState(false);
   const [name, setName] = useState(null);
   const [countries, setCountries] = useState([]);
-  const [questionsAsked, setQuestionsAsked] = useState(0);
   const [playing, togglePlaying] = useState(false);
   const [time, setTime] = useState(null);
   const [guess, setGuess] = useState(null);
@@ -30,9 +29,10 @@ function App({ dispatch, score, players, question, numberOfQuestions }) {
   }
 
   function startGame() {
+    dispatch({ type: 'PUT_TOTAL_TO_REDUCER', questionsAsked: 0 });
+    sendTotalToServer(0);
     generateQuestion();
-    setQuestionsAsked(0);
-    togglePlaying(true);
+    dispatch({ type: 'RESET_SCORES' });
   }
 
   function setNumber(e) {
@@ -64,6 +64,9 @@ function App({ dispatch, score, players, question, numberOfQuestions }) {
     const question = { questionType, wording, options, rightCountry };
     dispatch({ type: 'PUT_QUESTION_TO_REDUCER', question });
     sendQuestionToServer(question);
+    const total = questionsAsked + 1;
+    dispatch({ type: 'PUT_TOTAL_TO_REDUCER', questionsAsked: total });
+    sendTotalToServer(total);
   }
 
   function checkGuess(e) {
@@ -110,7 +113,6 @@ function App({ dispatch, score, players, question, numberOfQuestions }) {
       setTime(10);
       setGuess(null);
       togglePlaying(true);
-      setQuestionsAsked(q => q + 1);
     }
   }, [question]);
 
@@ -217,7 +219,8 @@ const mapStateToProps = state => ({
   score: state.score,
   players: state.players,
   question: state.question,
-  numberOfQuestions: state.numberOfQuestions
+  numberOfQuestions: state.numberOfQuestions,
+  questionsAsked: state.questionsAsked
 });
 
 export default connect(mapStateToProps)(App);

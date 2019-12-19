@@ -11,6 +11,7 @@ const configureSocket = dispatch => {
   socket.on('SEND_NUMBER_TO_CLIENTS', numberOfQuestions =>
     dispatch({ type: 'PUT_NUMBER_TO_REDUCER', numberOfQuestions })
   );
+  socket.on('SEND_TOTAL_TO_CLIENTS', questionsAsked => dispatch({ type: 'PUT_TOTAL_TO_REDUCER', questionsAsked }));
   return socket;
 };
 
@@ -19,5 +20,7 @@ export const sendNameToServer = player => socket.emit('SEND_NAME_TO_SERVER', pla
 export const sendQuestionToServer = question => socket.emit('SET_QUESTION', question);
 
 export const sendNumberToServer = numberOfQuestions => socket.emit('SET_NUMBER', numberOfQuestions);
+
+export const sendTotalToServer = questionsAsked => socket.emit('SET_TOTAL', questionsAsked);
 
 export default configureSocket;

@@ -37,6 +37,10 @@ io.on('connection', socket => {
     socket.broadcast.emit('SEND_NUMBER_TO_CLIENTS', numberOfQuestions);
   });
 
+  socket.on('SET_TOTAL', questionsAsked => {
+    socket.broadcast.emit('SEND_TOTAL_TO_CLIENTS', questionsAsked);
+  });
+
   socket.on('UPDATE_PLAYERS', players => {
     socket.broadcast.emit('SEND_NAMES_TO_CLIENTS', players);
     socket.emit('SEND_NAMES_TO_CLIENTS', players);
