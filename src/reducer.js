@@ -2,7 +2,6 @@ import { socket } from './index';
 
 const reducer = (
   state = {
-    score: 0,
     players: [],
     question: {},
     numberOfQuestions: 10,
@@ -14,7 +13,6 @@ const reducer = (
     case 'INCREASE_SCORE':
       state = {
         ...state,
-        score: state.score + 1,
         players: state.players.map(player => {
           if (player.name === action.name) {
             return { ...player, score: player.score + 1 };
@@ -26,7 +24,6 @@ const reducer = (
     case 'RESET_SCORES':
       state = {
         ...state,
-        score: 0,
         players: state.players.map(player => {
           return { ...player, score: 0 };
         })

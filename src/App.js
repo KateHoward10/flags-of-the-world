@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { sendNameToServer, sendQuestionToServer, sendNumberToServer, sendTotalToServer } from './socket';
 import './App.css';
 
-function App({ dispatch, score, players, question, numberOfQuestions, questionsAsked }) {
+function App({ dispatch, players, question, numberOfQuestions, questionsAsked }) {
   const [joined, setJoined] = useState(false);
   const [name, setName] = useState(null);
   const [countries, setCountries] = useState([]);
@@ -17,6 +17,10 @@ function App({ dispatch, score, players, question, numberOfQuestions, questionsA
   const questionTypes = ['capital', 'name', 'alpha2Code', 'flag'];
   const { questionType, wording, options, rightCountry } = question;
   const rightAnswer = rightCountry ? rightCountry[questionType === 'flag' ? 'name' : questionType] : null;
+  const score =
+    players.length && players.find(player => player.name === name)
+      ? players.find(player => player.name === name).score
+      : 0;
 
   function submitName(e) {
     e.preventDefault();
@@ -29,10 +33,8 @@ function App({ dispatch, score, players, question, numberOfQuestions, questionsA
   }
 
   function startGame() {
-    dispatch({ type: 'PUT_TOTAL_TO_REDUCER', questionsAsked: 0 });
-    sendTotalToServer(0);
-    generateQuestion();
     dispatch({ type: 'RESET_SCORES' });
+    generateQuestion(true);
   }
 
   function setNumber(e) {
@@ -42,7 +44,7 @@ function App({ dispatch, score, players, question, numberOfQuestions, questionsA
     sendNumberToServer(numberOfQuestions);
   }
 
-  function generateQuestion() {
+  function generateQuestion(first) {
     const rightCountry = countries[Math.floor(Math.random() * countries.length)];
     const questionType = questionTypes[Math.floor(Math.random() * questionTypes.length)];
     const wording = `${
@@ -64,7 +66,7 @@ function App({ dispatch, score, players, question, numberOfQuestions, questionsA
     const question = { questionType, wording, options, rightCountry };
     dispatch({ type: 'PUT_QUESTION_TO_REDUCER', question });
     sendQuestionToServer(question);
-    const total = questionsAsked + 1;
+    const total = first ? 1 : questionsAsked + 1;
     dispatch({ type: 'PUT_TOTAL_TO_REDUCER', questionsAsked: total });
     sendTotalToServer(total);
   }
@@ -160,7 +162,7 @@ function App({ dispatch, score, players, question, numberOfQuestions, questionsA
           {Boolean(inCharge && countries.length && !playing) && (
             <React.Fragment>
               <div className="quiz-setup">
-                <label for="questions">Number of questions in the quiz: {numberOfQuestions}</label>
+                <label htmlFor="questions">Number of questions in the quiz: {numberOfQuestions}</label>
                 <input type="range" min="5" max="50" value={numberOfQuestions} id="questions" onChange={setNumber} />
               </div>
               <button onClick={startGame}>Start the game!</button>
@@ -216,7 +218,6 @@ function App({ dispatch, score, players, question, numberOfQuestions, questionsA
 }
 
 const mapStateToProps = state => ({
-  score: state.score,
   players: state.players,
   question: state.question,
   numberOfQuestions: state.numberOfQuestions,
