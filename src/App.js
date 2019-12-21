@@ -177,7 +177,7 @@ function App({ dispatch, players, question, numberOfQuestions, questionsAsked })
                   <div style={{ height: '5px', width: `${time * 10}%`, background: 'blue' }} />
                 </div>
               )}
-              {wording && <p>{wording}</p>}
+              {wording && <h3>{wording}</h3>}
               {questionType === 'flag' && (
                 <img src={`https://www.countryflags.io/${rightCountry.alpha2Code}/flat/64.png`} alt="Mystery flag" />
               )}
@@ -189,7 +189,11 @@ function App({ dispatch, players, question, numberOfQuestions, questionsAsked })
                       value={option}
                       onClick={checkGuess}
                       className={
-                        guess && option === rightAnswer ? 'correct-answer' : guess === option ? 'wrong-answer' : ''
+                        guess && option === rightAnswer
+                          ? 'correct-answer option-button'
+                          : guess === option
+                          ? 'wrong-answer option-button'
+                          : 'option-button'
                       }
                     >
                       {questionType === 'alpha2Code' ? (
