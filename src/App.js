@@ -86,7 +86,7 @@ function App({ dispatch, players, question, numberOfQuestions, questionsAsked })
   // Set new question every ten seconds during game
   useInterval(
     () => {
-      if (inCharge && countries.length && questionsAsked < numberOfQuestions) {
+      if (inCharge && countries.length) {
         generateQuestion();
       }
     },
@@ -120,10 +120,9 @@ function App({ dispatch, players, question, numberOfQuestions, questionsAsked })
 
   // Find winner(s) if game ended
   useEffect(() => {
-    if (questionsAsked >= numberOfQuestions) {
+    if (questionsAsked > numberOfQuestions) {
       togglePlaying(false);
       setTime(null);
-      setWinners([]);
       const highScore = Math.max(...players.map(player => player.score));
       setWinners(players.filter(player => player.score === highScore));
     }
@@ -203,9 +202,11 @@ function App({ dispatch, players, question, numberOfQuestions, questionsAsked })
               </div>
             </div>
           )}
-          <p>
-            Your score: {score} / {questionsAsked}
-          </p>
+          {questionsAsked ? (
+            <p>
+              Your score: {score} / {playing ? questionsAsked : questionsAsked - 1}
+            </p>
+          ) : null}
         </React.Fragment>
       ) : (
         <form onSubmit={submitName}>
