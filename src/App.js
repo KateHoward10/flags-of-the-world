@@ -143,7 +143,6 @@ function App({ dispatch, players, question, numberOfQuestions, questionsAsked })
     <div>
       {joined ? (
         <React.Fragment>
-          <p>Your username is {name}</p>
           <p>
             {players.length <= 1
               ? 'No other players yet'
@@ -153,9 +152,9 @@ function App({ dispatch, players, question, numberOfQuestions, questionsAsked })
                   .join(', ')}`}
           </p>
           {Boolean(!playing && winners.length) && (
-            <h3>
+            <h4>
               The winner{winners.length > 1 ? 's are' : ' is'} {winners.map(winner => winner.name).join(' and ')}!
-            </h3>
+            </h4>
           )}
           {!playing && <p>You will have ten seconds to answer each question</p>}
           {Boolean(inCharge && countries.length && !playing) && (
@@ -189,11 +188,7 @@ function App({ dispatch, players, question, numberOfQuestions, questionsAsked })
                       value={option}
                       onClick={checkGuess}
                       className={
-                        guess && option === rightAnswer
-                          ? 'correct-answer option-button'
-                          : guess === option
-                          ? 'wrong-answer option-button'
-                          : 'option-button'
+                        guess && option === rightAnswer ? 'correct-answer' : guess === option ? 'wrong-answer' : ''
                       }
                     >
                       {questionType === 'alpha2Code' ? (
@@ -208,7 +203,7 @@ function App({ dispatch, players, question, numberOfQuestions, questionsAsked })
           )}
           {questionsAsked ? (
             <p>
-              Your score: {score} / {playing ? questionsAsked : questionsAsked - 1}
+              {name}’s score: {score} / {playing ? questionsAsked : questionsAsked - 1}
             </p>
           ) : null}
         </React.Fragment>
