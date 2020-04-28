@@ -5,6 +5,7 @@ import { sendNameToServer, sendQuestionToServer, sendNumberToServer, sendTotalTo
 import './App.css';
 
 function App({ dispatch, players, question, numberOfQuestions, questionsAsked }) {
+  const [multiplayer, toggleMultiplayer] = useState(false);
   const [joined, setJoined] = useState(false);
   const [name, setName] = useState(null);
   const [countries, setCountries] = useState([]);
@@ -143,18 +144,22 @@ function App({ dispatch, players, question, numberOfQuestions, questionsAsked })
     <div>
       {joined ? (
         <div className="container">
-          <p>
-            {players.length <= 1
-              ? 'No other players yet'
-              : `Other players: ${players
-                  .filter(player => player.name !== name)
-                  .map(player => player.name)
-                  .join(', ')}`}
-          </p>
-          {Boolean(!playing && winners.length) && (
-            <h4>
-              The winner{winners.length > 1 ? 's are' : ' is'} {winners.map(winner => winner.name).join(' and ')}!
-            </h4>
+          {multiplayer && (
+            <>
+              <p>
+                {players.length <= 1
+                  ? 'No other players yet'
+                  : `Other players: ${players
+                      .filter(player => player.name !== name)
+                      .map(player => player.name)
+                      .join(', ')}`}
+              </p>
+              {Boolean(!playing && winners.length) && (
+                <h4>
+                  The winner{winners.length > 1 ? 's are' : ' is'} {winners.map(winner => winner.name).join(' and ')}!
+                </h4>
+              )}
+            </>
           )}
           {!playing && <p>You will have ten seconds to answer each question</p>}
           {Boolean(inCharge && countries.length && !playing) && (
@@ -166,7 +171,7 @@ function App({ dispatch, players, question, numberOfQuestions, questionsAsked })
               <button onClick={startGame}>Start the game!</button>
             </React.Fragment>
           )}
-          {Boolean(players.length && !inCharge && !question.wording) && (
+          {Boolean(players.length && !inCharge && !question.wording && multiplayer) && (
             <p>Waiting for {players[0].name} to start the game...</p>
           )}
           {playing && (
@@ -210,6 +215,14 @@ function App({ dispatch, players, question, numberOfQuestions, questionsAsked })
       ) : (
         <div className="container">
           <h1>Welcome to Flags of the World</h1>
+          <div className="switch-container">
+            <small>Single player</small>
+            <label class="switch">
+              <input type="checkbox" onChange={e => toggleMultiplayer(e.target.value)} />
+              <span class="slider"></span>
+            </label>
+            <small>Multiplayer</small>
+          </div>
           <p>Please enter a username to begin</p>
           <form onSubmit={submitName}>
             <input onChange={e => setName(e.target.value)} placeholder="Username" autoFocus />
