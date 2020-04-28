@@ -28,6 +28,7 @@ p,
 button,
 input {
   font-size: 1rem;
+  font-family: 'Open Sans', Verdana, sans-serif;
 }
 
 button {
@@ -36,7 +37,6 @@ button {
   padding: 4px 5px;
   margin: 5px;
   border-radius: 5px;
-  font-family: 'Open Sans', Verdana, sans-serif;
   outline: none;
 }
 
