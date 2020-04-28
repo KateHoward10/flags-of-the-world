@@ -142,7 +142,7 @@ function App({ dispatch, players, question, numberOfQuestions, questionsAsked })
   return (
     <div>
       {joined ? (
-        <React.Fragment>
+        <div className="container">
           <p>
             {players.length <= 1
               ? 'No other players yet'
@@ -206,12 +206,16 @@ function App({ dispatch, players, question, numberOfQuestions, questionsAsked })
               {name}’s score: {score} / {playing ? questionsAsked : questionsAsked - 1}
             </p>
           ) : null}
-        </React.Fragment>
+        </div>
       ) : (
-        <form onSubmit={submitName}>
-          <input onChange={e => setName(e.target.value)} placeholder="Username" />
-          <button type="submit">Join</button>
-        </form>
+        <div className="container">
+          <h1>Welcome to Flags of the World</h1>
+          <p>Please enter a username to begin</p>
+          <form onSubmit={submitName}>
+            <input onChange={e => setName(e.target.value)} placeholder="Username" autoFocus />
+            <button type="submit">Join</button>
+          </form>
+        </div>
       )}
     </div>
   );
