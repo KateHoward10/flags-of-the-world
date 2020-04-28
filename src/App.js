@@ -84,6 +84,10 @@ function App({ dispatch, players, question, numberOfQuestions, questionsAsked })
     }
   }
 
+  function reset() {
+
+  }
+
   // Set new question every ten seconds during game
   useInterval(
     () => {
@@ -155,21 +159,29 @@ function App({ dispatch, players, question, numberOfQuestions, questionsAsked })
                       .join(', ')}`}
               </p>
               {Boolean(!playing && winners.length) && (
-                <h4>
+                <h3>
                   The winner{winners.length > 1 ? 's are' : ' is'} {winners.map(winner => winner.name).join(' and ')}!
-                </h4>
+                </h3>
               )}
             </>
           )}
           {!playing && <p>You will have ten seconds to answer each question</p>}
           {Boolean(inCharge && countries.length && !playing) && (
-            <React.Fragment>
+            <>
               <div className="quiz-setup">
                 <label htmlFor="questions">Number of questions in the quiz: {numberOfQuestions}</label>
                 <input type="range" min="5" max="50" value={numberOfQuestions} id="questions" onChange={setNumber} />
               </div>
-              <button onClick={startGame}>Start the game!</button>
-            </React.Fragment>
+              <div className="switch-container">
+                <small>Single player</small>
+                <label className="switch">
+                  <input type="checkbox" onChange={e => toggleMultiplayer(e.target.checked)} />
+                  <span className="slider"></span>
+                </label>
+                <small>Multiplayer</small>
+              </div>
+              {Boolean(players.length > 1 || !multiplayer) && <button onClick={startGame}>Start the game!</button>}
+            </>
           )}
           {Boolean(players.length && !inCharge && !question.wording && multiplayer) && (
             <p>Waiting for {players[0].name} to start the game...</p>
@@ -215,14 +227,6 @@ function App({ dispatch, players, question, numberOfQuestions, questionsAsked })
       ) : (
         <div className="container">
           <h1>Welcome to Flags of the World</h1>
-          <div className="switch-container">
-            <small>Single player</small>
-            <label class="switch">
-              <input type="checkbox" onChange={e => toggleMultiplayer(e.target.value)} />
-              <span class="slider"></span>
-            </label>
-            <small>Multiplayer</small>
-          </div>
           <p>Please enter a username to begin</p>
           <form onSubmit={submitName}>
             <input onChange={e => setName(e.target.value)} placeholder="Username" autoFocus />
