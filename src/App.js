@@ -84,10 +84,6 @@ function App({ dispatch, players, question, numberOfQuestions, questionsAsked })
     }
   }
 
-  function reset() {
-
-  }
-
   // Set new question every ten seconds during game
   useInterval(
     () => {
@@ -168,10 +164,8 @@ function App({ dispatch, players, question, numberOfQuestions, questionsAsked })
           {!playing && <p>You will have ten seconds to answer each question</p>}
           {Boolean(inCharge && countries.length && !playing) && (
             <>
-              <div className="quiz-setup">
-                <label htmlFor="questions">Number of questions in the quiz: {numberOfQuestions}</label>
-                <input type="range" min="5" max="50" value={numberOfQuestions} id="questions" onChange={setNumber} />
-              </div>
+              <label htmlFor="questions">Number of questions in the quiz: </label>
+              <input type="number" min="5" max="50" value={numberOfQuestions} id="questions" onChange={setNumber} />
               <div className="switch-container">
                 <small>Single player</small>
                 <label className="switch">
@@ -234,7 +228,7 @@ function App({ dispatch, players, question, numberOfQuestions, questionsAsked })
           <p><small>Be warned, there are questions about capitals too.</small></p>
           <p>Please enter a username to begin</p>
           <form onSubmit={submitName}>
-            <input onChange={e => setName(e.target.value)} placeholder="Username" autoFocus />
+            <input onChange={e => setName(e.target.value)} placeholder="Username" type="text" autoFocus />
             <button type="submit">Join</button>
           </form>
         </div>
