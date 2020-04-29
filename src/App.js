@@ -97,9 +97,9 @@ function App({ dispatch, players, question, numberOfQuestions, questionsAsked })
   // Count down each question
   useInterval(
     () => {
-      setTime(time - 1);
+      setTime(time - 10);
     },
-    question.wording && time > 1 ? 1000 : null
+    question.wording && time > 10 ? 100 : null
   );
 
   // Reset when new game starts
@@ -113,7 +113,7 @@ function App({ dispatch, players, question, numberOfQuestions, questionsAsked })
   // Update stuff when new question is set
   useEffect(() => {
     if (question.wording) {
-      setTime(10);
+      setTime(1000);
       setGuess(null);
       togglePlaying(true);
     }
@@ -184,7 +184,7 @@ function App({ dispatch, players, question, numberOfQuestions, questionsAsked })
             <div className="question">
               {time && (
                 <div className="time-container">
-                  <div style={{ height: '5px', width: `${time * 10}%`, background: 'blue' }} />
+                  <div style={{ height: '5px', width: `${100 - (time / 10)}%`, background: 'blue' }} />
                 </div>
               )}
               {wording && <h3>{wording}</h3>}

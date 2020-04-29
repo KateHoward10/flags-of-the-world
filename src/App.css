@@ -11,7 +11,7 @@ body {
 }
 
 .container {
-  background-color: rgba(0,240,240,54%);
+  background-color: rgba(0,255,255,70%);
   padding: 20px;
   border-radius: 10px;
   min-height: 60vh;
@@ -145,7 +145,7 @@ input:checked + .slider:before {
 
 .time-container {
   height: 5px;
-  width: 50vw;
+  width: 40vw;
   border: 1px solid black;
   align-self: center;
 }
