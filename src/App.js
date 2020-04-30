@@ -142,6 +142,7 @@ function App({ dispatch, players, question, numberOfQuestions, questionsAsked })
 
   return (
     <div>
+      {(name && joined) && <div className="username">{name}</div>}
       {joined ? (
         <div className="container">
           {multiplayer && (
@@ -160,6 +161,11 @@ function App({ dispatch, players, question, numberOfQuestions, questionsAsked })
                 </h3>
               )}
             </>
+          )}
+          {Boolean(questionsAsked) && (
+            <h4>
+              Your score: {score} / {playing ? questionsAsked : questionsAsked - 1}
+            </h4>
           )}
           {!playing && <p>You will have ten seconds to answer each question</p>}
           {Boolean(inCharge && countries.length && !playing) && (
@@ -212,11 +218,6 @@ function App({ dispatch, players, question, numberOfQuestions, questionsAsked })
               </div>
             </div>
           )}
-          {questionsAsked ? (
-            <p>
-              {name}’s score: {score} / {playing ? questionsAsked : questionsAsked - 1}
-            </p>
-          ) : null}
         </div>
       ) : (
         <div className="container">
