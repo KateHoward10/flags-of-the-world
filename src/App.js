@@ -9,7 +9,6 @@ import Result from './components/Result';
 import './App.css';
 
 function App({ dispatch, players, question, numberOfQuestions, questionsAsked }) {
-  const [multiplayer, toggleMultiplayer] = useState(false);
   const [joined, setJoined] = useState(false);
   const [name, setName] = useState(null);
   const [countries, setCountries] = useState([]);
@@ -20,7 +19,7 @@ function App({ dispatch, players, question, numberOfQuestions, questionsAsked })
   const inCharge = players.length && players[0].name === name;
   const endpoint = 'https://restcountries.eu/rest/v2/all';
   const questionTypes = ['capital', 'name', 'alpha2Code', 'flag'];
-  const { questionType, wording, options, rightCountry } = question;
+  const { questionType, rightCountry } = question;
   const rightAnswer = rightCountry ? rightCountry[questionType === 'flag' ? 'name' : questionType] : null;
   const score =
     players.length && players.find(player => player.name === name)
@@ -88,6 +87,12 @@ function App({ dispatch, players, question, numberOfQuestions, questionsAsked })
     }
   }
 
+  function reset() {
+    setWinners([]);
+    dispatch({ type: 'PUT_QUESTION_TO_REDUCER', question: {} });
+    sendQuestionToServer({});
+  }
+
   // Set new question every ten seconds during game
   useInterval(
     () => {
@@ -150,46 +155,47 @@ function App({ dispatch, players, question, numberOfQuestions, questionsAsked })
       <div className="container">
         {joined ? (
           <>
-            {multiplayer && (
+            <p>
+              {players.length <= 1
+                ? 'No other players yet'
+                : `Other players: ${players
+                    .filter(player => player.name !== name)
+                    .map(player => player.name)
+                    .join(', ')}`}
+            </p>
+            {playing ? (
               <>
-                <p>
-                  {players.length <= 1
-                    ? 'No other players yet'
-                    : `Other players: ${players
-                        .filter(player => player.name !== name)
-                        .map(player => player.name)
-                        .join(', ')}`}
-                </p>
-                {Boolean(!playing && winners.length) && <Result winners={winners} />}
+                <Question
+                  time={time}
+                  question={question}
+                  checkGuess={checkGuess}
+                  guess={guess}
+                  rightAnswer={rightAnswer}
+                />
+                {Boolean(questionsAsked) && (
+                  <p>
+                    Your score: {score} / {playing ? questionsAsked : questionsAsked - 1}
+                  </p>
+                )}
               </>
-            )}
-            {Boolean(questionsAsked) && (
-              <h4>
-                Your score: {score} / {playing ? questionsAsked : questionsAsked - 1}
-              </h4>
-            )}
-            {!playing && <p>You will have ten seconds to answer each question</p>}
-            {Boolean(inCharge && countries.length && !playing) && (
-              <Setup
-                numberOfQuestions={numberOfQuestions}
-                setNumber={setNumber}
-                onSwitch={e => toggleMultiplayer(e.target.checked)}
-                players={players}
-                multiplayer={multiplayer}
-                startGame={startGame}
-              />
-            )}
-            {Boolean(players.length && !inCharge && !question.wording && multiplayer) && (
-              <p>Waiting for {players[0].name} to start the game...</p>
-            )}
-            {playing && (
-              <Question
-                time={time}
-                question={question}
-                checkGuess={checkGuess}
-                guess={guess}
-                rightAnswer={rightAnswer}
-              />
+            ) : (
+              <>
+                {Boolean(winners.length) && <Result winners={winners} name={name} reset={reset} inCharge={inCharge} />}
+                {Boolean(players.length && !question.wording) && (
+                  <>
+                    <p>You will have ten seconds to answer each question</p>
+                    {!inCharge && <p>Waiting for {players[0].name} to start the game...</p>}
+                  </>
+                )}
+                {Boolean(inCharge && countries.length && !winners.length) && (
+                  <Setup
+                    numberOfQuestions={numberOfQuestions}
+                    setNumber={setNumber}
+                    players={players}
+                    startGame={startGame}
+                  />
+                )}
+              </>
             )}
           </>
         ) : (
