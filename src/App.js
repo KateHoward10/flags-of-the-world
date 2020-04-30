@@ -2,6 +2,10 @@ import React, { useState, useEffect } from 'react';
 import useInterval from './useInterval';
 import { connect } from 'react-redux';
 import { sendNameToServer, sendQuestionToServer, sendNumberToServer, sendTotalToServer } from './socket';
+import Welcome from './components/Welcome';
+import Setup from './components/Setup';
+import Question from './components/Question';
+import Result from './components/Result';
 import './App.css';
 
 function App({ dispatch, players, question, numberOfQuestions, questionsAsked }) {
@@ -143,97 +147,55 @@ function App({ dispatch, players, question, numberOfQuestions, questionsAsked })
   return (
     <div>
       {(name && joined) && <div className="username">{name}</div>}
-      {joined ? (
-        <div className="container">
-          {multiplayer && (
-            <>
-              <p>
-                {players.length <= 1
-                  ? 'No other players yet'
-                  : `Other players: ${players
-                      .filter(player => player.name !== name)
-                      .map(player => player.name)
-                      .join(', ')}`}
-              </p>
-              {Boolean(!playing && winners.length) && (
-                <h3>
-                  The winner{winners.length > 1 ? 's are' : ' is'} {winners.map(winner => winner.name).join(' and ')}!
-                </h3>
-              )}
-            </>
-          )}
-          {Boolean(questionsAsked) && (
-            <h4>
-              Your score: {score} / {playing ? questionsAsked : questionsAsked - 1}
-            </h4>
-          )}
-          {!playing && <p>You will have ten seconds to answer each question</p>}
-          {Boolean(inCharge && countries.length && !playing) && (
-            <>
-              <label htmlFor="questions">Number of questions in the quiz: </label>
-              <input type="number" min="5" max="50" value={numberOfQuestions} id="questions" onChange={setNumber} />
-              <div className="switch-container">
-                <small>Single player</small>
-                <label className="switch">
-                  <input type="checkbox" onChange={e => toggleMultiplayer(e.target.checked)} />
-                  <span className="slider"></span>
-                </label>
-                <small>Multiplayer</small>
-              </div>
-              {Boolean(players.length > 1 || !multiplayer) && <button onClick={startGame}>Start the game!</button>}
-            </>
-          )}
-          {Boolean(players.length && !inCharge && !question.wording && multiplayer) && (
-            <p>Waiting for {players[0].name} to start the game...</p>
-          )}
-          {playing && (
-            <div className="question">
-              {time && (
-                <div className="time-container">
-                  <div style={{ height: '5px', width: `${100 - time}%`, background: 'blue' }} />
-                </div>
-              )}
-              {wording && <h3>{wording}</h3>}
-              {questionType === 'flag' && (
-                <img src={`https://www.countryflags.io/${rightCountry.alpha2Code}/flat/64.png`} alt="Mystery flag" />
-              )}
-              <div>
-                {options &&
-                  options.map((option, index) => (
-                    <button
-                      key={index}
-                      value={option}
-                      onClick={checkGuess}
-                      className={
-                        guess && option === rightAnswer ? 'correct-answer' : guess === option ? 'wrong-answer' : ''
-                      }
-                    >
-                      {questionType === 'alpha2Code' ? (
-                        <img src={`https://www.countryflags.io/${option}/flat/64.png`} alt="Mystery flag" />
-                      ) : (
-                        option
-                      )}
-                    </button>
-                  ))}
-              </div>
-            </div>
-          )}
-        </div>
-      ) : (
-        <div className="container">
-          <h1>Welcome to Flags of the World</h1>
-          <img src="https://www.countryflags.io/mz/flat/64.png" alt="Flag of Mozambique" />
-          <img src="https://www.countryflags.io/np/flat/64.png" alt="Flag of Nepal" />
-          <img src="https://www.countryflags.io/va/flat/64.png" alt="Flag of Vatican City" />
-          <img src="https://www.countryflags.io/sc/flat/64.png" alt="Flag of Seychelles" />
-          <p><small>Be warned, there are questions about capitals too.</small></p>
-          <p>Please enter a username to begin</p>
-          <form onSubmit={submitName}>
-            <input onChange={e => setName(e.target.value)} placeholder="Username" type="text" autoFocus />
-            <button type="submit">Join</button>
-          </form>
-        </div>
-      )}
+      <div className="container">
+        {joined ? (
+          <>
+            {multiplayer && (
+              <>
+                <p>
+                  {players.length <= 1
+                    ? 'No other players yet'
+                    : `Other players: ${players
+                        .filter(player => player.name !== name)
+                        .map(player => player.name)
+                        .join(', ')}`}
+                </p>
+                {Boolean(!playing && winners.length) && <Result winners={winners} />}
+              </>
+            )}
+            {Boolean(questionsAsked) && (
+              <h4>
+                Your score: {score} / {playing ? questionsAsked : questionsAsked - 1}
+              </h4>
+            )}
+            {!playing && <p>You will have ten seconds to answer each question</p>}
+            {Boolean(inCharge && countries.length && !playing) && (
+              <Setup
+                numberOfQuestions={numberOfQuestions}
+                setNumber={setNumber}
+                onSwitch={e => toggleMultiplayer(e.target.checked)}
+                players={players}
+                multiplayer={multiplayer}
+                startGame={startGame}
+              />
+            )}
+            {Boolean(players.length && !inCharge && !question.wording && multiplayer) && (
+              <p>Waiting for {players[0].name} to start the game...</p>
+            )}
+            {playing && (
+              <Question
+                time={time}
+                question={question}
+                checkGuess={checkGuess}
+                guess={guess}
+                rightAnswer={rightAnswer}
+              />
+            )}
+          </>
+        ) : (
+          <Welcome submitName={submitName} setName={e => setName(e.target.value)} />
+        )}
+      </div>
     </div>
   );
 }
