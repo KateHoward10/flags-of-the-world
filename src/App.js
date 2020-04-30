@@ -99,7 +99,7 @@ function App({ dispatch, players, question, numberOfQuestions, questionsAsked })
     () => {
       setTime(time - 1);
     },
-    question.wording && time > 1 ? 10 : null
+    question.wording && time > 1 ? 100 : null
   );
 
   // Reset when new game starts
