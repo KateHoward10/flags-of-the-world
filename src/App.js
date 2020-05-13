@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import useInterval from './useInterval';
 import { connect } from 'react-redux';
 import { sendNameToServer, sendQuestionToServer, sendNumberToServer, sendTotalToServer } from './socket';
@@ -87,6 +87,16 @@ function App({ dispatch, players, question, numberOfQuestions, questionsAsked })
     }
   }
 
+  // Find winner(s) if game ended
+  const checkForEnd = useCallback((questionsAsked) => {
+    if (questionsAsked > numberOfQuestions) {
+      togglePlaying(false);
+      setTime(null);
+      const highScore = Math.max(...players.map(player => player.score));
+      setWinners(players.filter(player => player.score === highScore));
+    }
+  }, [numberOfQuestions, players]);
+
   function reset() {
     setWinners([]);
     dispatch({ type: 'PUT_QUESTION_TO_REDUCER', question: {} });
@@ -94,20 +104,13 @@ function App({ dispatch, players, question, numberOfQuestions, questionsAsked })
   }
 
   // Set new question every ten seconds during game
-  useInterval(
-    () => {
-      if (inCharge && countries.length) {
-        generateQuestion();
-      }
-    },
-    playing ? 10000 : null
-  );
+  useInterval(() => {
+    if (inCharge && countries.length) generateQuestion();
+  }, playing ? 10000 : null);
 
   // Count down each question
   useInterval(
-    () => {
-      setTime(time - 1);
-    },
+    () => setTime(time - 1),
     question.wording && time > 1 ? 100 : null
   );
 
@@ -128,15 +131,7 @@ function App({ dispatch, players, question, numberOfQuestions, questionsAsked })
     }
   }, [question]);
 
-  // Find winner(s) if game ended
-  useEffect(() => {
-    if (questionsAsked > numberOfQuestions) {
-      togglePlaying(false);
-      setTime(null);
-      const highScore = Math.max(...players.map(player => player.score));
-      setWinners(players.filter(player => player.score === highScore));
-    }
-  }, [questionsAsked, players, numberOfQuestions]);
+  useEffect(() => checkForEnd(questionsAsked), [questionsAsked, checkForEnd]);
 
   // If first player, get country data
   useEffect(() => {
