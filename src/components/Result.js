@@ -1,10 +1,10 @@
 import React from 'react';
 
-const Result = ({ winners, name, reset, inCharge }) => (
+const Result = ({ winners, name, reset, inCharge, multiplayer }) => (
   <>
     {winners.map(winner => winner.name).includes(name) && <h2>Well done!</h2>}
     <h3>
-      The winner{winners.length > 1 ? 's are' : ' is'} {winners.map(winner => winner.name === name ? "you" : winner.name).join(' and ')}, with {winners[0].score}!
+      {multiplayer ? `The winner${winners.length > 1 ? 's are' : ' is'} ${winners.map(winner => winner.name === name ? "you" : winner.name).join(' and ')}, with ${winners[0].score}!` : `You scored ${winners[0].score}`}
     </h3>
     {inCharge && <button onClick={reset}>New Game</button>}
   </>

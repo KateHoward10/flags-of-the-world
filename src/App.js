@@ -9,6 +9,7 @@ import Result from './components/Result';
 import './App.css';
 
 function App({ dispatch, players, question, numberOfQuestions, questionsAsked }) {
+  const [multiplayer, toggleMultiplayer] = useState(false);
   const [joined, setJoined] = useState(false);
   const [name, setName] = useState(null);
   const [countries, setCountries] = useState([]);
@@ -16,7 +17,7 @@ function App({ dispatch, players, question, numberOfQuestions, questionsAsked })
   const [time, setTime] = useState(null);
   const [guess, setGuess] = useState(null);
   const [winners, setWinners] = useState([]);
-  const inCharge = players.length && players[0].name === name;
+  const inCharge = !multiplayer || (players.length && players[0].name === name);
   const endpoint = 'https://restcountries.eu/rest/v2/all';
   const questionTypes = ['capital', 'name', 'alpha2Code', 'flag'];
   const { questionType, rightCountry } = question;
@@ -150,14 +151,16 @@ function App({ dispatch, players, question, numberOfQuestions, questionsAsked })
       <div className="container">
         {joined ? (
           <>
-            <p>
-              {players.length <= 1
-                ? 'No other players yet'
-                : `Other players: ${players
-                    .filter(player => player.name !== name)
-                    .map(player => player.name)
-                    .join(', ')}`}
-            </p>
+            {multiplayer && (
+              <p>
+                {players.length <= 1
+                  ? 'No other players yet'
+                  : `Other players: ${players
+                      .filter(player => player.name !== name)
+                      .map(player => player.name)
+                      .join(', ')}`}
+              </p>
+            )}
             {playing ? (
               <>
                 <Question
@@ -175,7 +178,7 @@ function App({ dispatch, players, question, numberOfQuestions, questionsAsked })
               </>
             ) : (
               <>
-                {Boolean(winners.length) && <Result winners={winners} name={name} reset={reset} inCharge={inCharge} />}
+                {Boolean(winners.length) && <Result winners={winners} name={name} reset={reset} inCharge={inCharge} mutliplayer={multiplayer} />}
                 {Boolean(players.length && !question.wording) && (
                   <>
                     <p>You will have ten seconds to answer each question</p>
@@ -186,6 +189,7 @@ function App({ dispatch, players, question, numberOfQuestions, questionsAsked })
                   <Setup
                     numberOfQuestions={numberOfQuestions}
                     setNumber={setNumber}
+                    multiplayer={multiplayer}
                     players={players}
                     startGame={startGame}
                   />
@@ -194,7 +198,11 @@ function App({ dispatch, players, question, numberOfQuestions, questionsAsked })
             )}
           </>
         ) : (
-          <Welcome submitName={submitName} setName={e => setName(e.target.value)} />
+          <Welcome
+            onSwitch={e => toggleMultiplayer(e.target.checked)}
+            submitName={submitName}
+            setName={e => setName(e.target.value)}
+          />
         )}
       </div>
     </div>

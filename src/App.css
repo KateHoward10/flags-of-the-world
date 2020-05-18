@@ -54,6 +54,11 @@ button > * {
   pointer-events: none;
 }
 
+button[type=submit] {
+  display: inline;
+  margin-left: 10px;
+}
+
 input {
   background-color: rgba(0, 0, 0, 50%);
   border: none;
