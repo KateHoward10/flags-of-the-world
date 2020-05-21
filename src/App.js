@@ -184,7 +184,7 @@ function App({ dispatch, players, question, numberOfQuestions, questionsAsked })
               </>
             ) : (
               <>
-                {Boolean(winners.length) && <Result winners={winners} name={name} reset={reset} inCharge={inCharge} mutliplayer={multiplayer} />}
+                {Boolean(winners.length) && <Result winners={winners} name={name} reset={reset} inCharge={inCharge} multiplayer={multiplayer} />}
                 {Boolean(players.length && !question.wording) && (
                   <>
                     <p>You will have ten seconds to answer each question</p>
