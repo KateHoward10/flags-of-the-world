@@ -104,7 +104,6 @@ function App({ dispatch, players, question, numberOfQuestions, questionsAsked })
   }, [numberOfQuestions, players, multiplayer, name, score]);
 
   function reset() {
-    setScore(0);
     setWinners([]);
     dispatch({ type: 'PUT_QUESTION_TO_REDUCER', question: {} });
     if (multiplayer) sendQuestionToServer({});
@@ -124,6 +123,7 @@ function App({ dispatch, players, question, numberOfQuestions, questionsAsked })
   // Reset when new game starts
   useEffect(() => {
     if (playing) {
+      setScore(0);
       setGuess(null);
       setWinners([]);
     }

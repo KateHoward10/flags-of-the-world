@@ -166,7 +166,7 @@ input:checked + .slider:before {
 @media screen and (min-width: 600px) {
   .option-button {
     display: inline;
-    margin: 20px;
+    margin: 10px;
   }
 
   .option-container {
