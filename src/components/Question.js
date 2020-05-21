@@ -22,9 +22,9 @@ function Question({ time, question, checkGuess, guess, rightAnswer }) {
                 key={index}
                 value={option}
                 onClick={checkGuess}
-                className={
+                className={`${
                   guess && option === rightAnswer ? 'correct-answer' : guess === option ? 'wrong-answer' : ''
-                }
+                } option-button`}
               >
                 {questionType === 'alpha2Code' ? (
                   <img src={`https://www.countryflags.io/${option}/flat/64.png`} alt="Mystery flag" />
