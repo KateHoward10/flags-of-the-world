@@ -12,6 +12,7 @@ function App({ dispatch, players, question, numberOfQuestions, questionsAsked })
   const [multiplayer, toggleMultiplayer] = useState(false);
   const [joined, setJoined] = useState(false);
   const [name, setName] = useState(null);
+  const [score, setScore] = useState(0);
   const [countries, setCountries] = useState([]);
   const [playing, togglePlaying] = useState(false);
   const [time, setTime] = useState(null);
@@ -22,23 +23,22 @@ function App({ dispatch, players, question, numberOfQuestions, questionsAsked })
   const questionTypes = ['capital', 'name', 'alpha2Code', 'flag'];
   const { questionType, rightCountry } = question;
   const rightAnswer = rightCountry ? rightCountry[questionType === 'flag' ? 'name' : questionType] : null;
-  const score =
-    players.length && players.find(player => player.name === name)
-      ? players.find(player => player.name === name).score
-      : 0;
 
   function submitName(e) {
     e.preventDefault();
-    if (players.find(player => player.name === name)) {
-      alert('That name is already taken, sorry');
-    } else {
-      sendNameToServer({ name, score: 0 });
-      setJoined(true);
+    if (multiplayer) {
+      if (players.find(player => player.name === name)) {
+        return alert('That name is already taken, sorry');
+      } else {
+        sendNameToServer({ name, score: 0 });
+      }
     }
+    setJoined(true);
+    setScore(0);
   }
 
   function startGame() {
-    dispatch({ type: 'RESET_SCORES' });
+    if (multiplayer) dispatch({ type: 'RESET_SCORES' });
     generateQuestion(true);
   }
 
@@ -70,17 +70,22 @@ function App({ dispatch, players, question, numberOfQuestions, questionsAsked })
     const options = optionsToSet.sort(() => Math.random() - 0.5);
     const question = { questionType, wording, options, rightCountry };
     dispatch({ type: 'PUT_QUESTION_TO_REDUCER', question });
-    sendQuestionToServer(question);
     const total = first ? 1 : questionsAsked + 1;
     dispatch({ type: 'PUT_TOTAL_TO_REDUCER', questionsAsked: total });
-    sendTotalToServer(total);
+    if (multiplayer) {
+      sendQuestionToServer(question);
+      sendTotalToServer(total);
+    }
   }
 
   function checkGuess(e) {
     if (!guess) {
       setGuess(e.target.value);
       if (e.target.value === rightAnswer) {
-        dispatch({ type: 'INCREASE_SCORE', name });
+        if (multiplayer) {
+          dispatch({ type: 'INCREASE_SCORE', name });
+        }
+        setScore(s => s + 1);
         e.target.classList.add('correct-answer');
       } else {
         e.target.classList.add('wrong-answer');
@@ -94,14 +99,15 @@ function App({ dispatch, players, question, numberOfQuestions, questionsAsked })
       togglePlaying(false);
       setTime(null);
       const highScore = Math.max(...players.map(player => player.score));
-      setWinners(players.filter(player => player.score === highScore));
+      setWinners(multiplayer ? players.filter(player => player.score === highScore) : [{name, score}]);
     }
-  }, [numberOfQuestions, players]);
+  }, [numberOfQuestions, players, multiplayer, name, score]);
 
   function reset() {
+    setScore(0);
     setWinners([]);
     dispatch({ type: 'PUT_QUESTION_TO_REDUCER', question: {} });
-    sendQuestionToServer({});
+    if (multiplayer) sendQuestionToServer({});
   }
 
   // Set new question every ten seconds during game
