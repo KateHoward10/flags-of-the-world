@@ -177,7 +177,7 @@ function App({ dispatch, players, question, numberOfQuestions, questionsAsked })
                   rightAnswer={rightAnswer}
                 />
                 {Boolean(questionsAsked) && (
-                  <p>
+                  <p className="score-container">
                     Your score: {score} / {playing ? questionsAsked : questionsAsked - 1}
                   </p>
                 )}
@@ -185,7 +185,7 @@ function App({ dispatch, players, question, numberOfQuestions, questionsAsked })
             ) : (
               <>
                 {Boolean(winners.length) && <Result winners={winners} name={name} reset={reset} inCharge={inCharge} multiplayer={multiplayer} />}
-                {Boolean(players.length && !question.wording) && (
+                {Boolean((players.length || !multiplayer) && !question.wording) && (
                   <>
                     <p>You will have ten seconds to answer each question</p>
                     {!inCharge && <p>Waiting for {players[0].name} to start the game...</p>}

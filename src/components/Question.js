@@ -8,7 +8,7 @@ function Question({ time, question, checkGuess, guess, rightAnswer }) {
       <div className="question">
         {time && (
           <div className="time-container">
-            <div style={{ height: '5px', width: `${100 - time}%`, background: 'blue' }} />
+            <div style={{ height: '10px', width: `${100 - time}%`, background: 'blue' }} />
           </div>
         )}
         {wording && <h3>{wording}</h3>}
