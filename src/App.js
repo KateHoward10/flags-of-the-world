@@ -94,14 +94,14 @@ function App({ dispatch, players, question, numberOfQuestions, questionsAsked })
   }
 
   // Find winner(s) if game ended
-  const checkForEnd = useCallback((questionsAsked) => {
+  const checkForEnd = useCallback((questionsAsked, numberOfQuestions) => {
     if (questionsAsked > numberOfQuestions) {
       togglePlaying(false);
       setTime(null);
       const highScore = Math.max(...players.map(player => player.score));
       setWinners(multiplayer ? players.filter(player => player.score === highScore) : [{name, score}]);
     }
-  }, [numberOfQuestions, players, multiplayer, name, score]);
+  }, [players, multiplayer, name, score]);
 
   function reset() {
     setWinners([]);
@@ -138,7 +138,7 @@ function App({ dispatch, players, question, numberOfQuestions, questionsAsked })
     }
   }, [question]);
 
-  useEffect(() => checkForEnd(questionsAsked), [questionsAsked, checkForEnd]);
+  useEffect(() => checkForEnd(questionsAsked, numberOfQuestions), [questionsAsked, numberOfQuestions, checkForEnd]);
 
   // If first player, get country data
   useEffect(() => {
