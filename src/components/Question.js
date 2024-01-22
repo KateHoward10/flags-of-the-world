@@ -13,7 +13,7 @@ function Question({ time, question, checkGuess, guess, rightAnswer }) {
         )}
         {wording && <h3>{wording}</h3>}
         {questionType === 'flag' && (
-          <img src={`https://www.countryflags.io/${rightCountry.alpha2Code}/flat/64.png`} alt="Mystery flag" />
+          <img src={`https://flagsapi.com/${rightCountry.alpha2Code.toUpperCase()}/flat/64.png`} alt="Mystery flag" />
         )}
         <div>
           {options &&
@@ -27,7 +27,7 @@ function Question({ time, question, checkGuess, guess, rightAnswer }) {
                 } option-button`}
               >
                 {questionType === 'alpha2Code' ? (
-                  <img src={`https://www.countryflags.io/${option}/flat/64.png`} alt="Mystery flag" />
+                  <img src={`https://flagsapi.com/${option.toUpperCase()}/flat/64.png`} alt="Mystery flag" />
                 ) : (
                   option
                 )}
