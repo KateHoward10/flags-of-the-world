@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "proxy": "http://localhost:8000",
   "private": true,
+  "engines": {
+    "node": "20.x"
+  },
   "dependencies": {
     "concurrently": "^5.0.0",
     "cors": "^2.8.5",
