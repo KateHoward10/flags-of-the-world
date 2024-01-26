@@ -19,10 +19,8 @@ function App({ dispatch, players, question, numberOfQuestions, questionsAsked })
   const [guess, setGuess] = useState(null);
   const [winners, setWinners] = useState([]);
   const inCharge = !multiplayer || (players.length && players[0].name === name);
-  const endpoint = 'https://restcountries.eu/rest/v2/all';
-  const questionTypes = ['capital', 'name', 'alpha2Code', 'flag'];
-  const { questionType, rightCountry } = question;
-  const rightAnswer = rightCountry ? rightCountry[questionType === 'flag' ? 'name' : questionType] : null;
+  const endpoint = 'https://restcountries.com/v3.1/all';
+  const questionTypes = ['capital', 'name', 'cca2', 'flag'];
 
   function submitName(e) {
     e.preventDefault();
@@ -49,26 +47,39 @@ function App({ dispatch, players, question, numberOfQuestions, questionsAsked })
     sendNumberToServer(numberOfQuestions);
   }
 
+  function getAnswer(details, type) {
+    switch(type) {
+      case "capital":
+        return details.capital[0];
+      case "name":
+      case "flag":
+        return details.name.common;
+      default:
+        return details[type];
+    }
+  }
+
   function generateQuestion(first) {
     const rightCountry = countries[Math.floor(Math.random() * countries.length)];
     const questionType = questionTypes[Math.floor(Math.random() * questionTypes.length)];
     const wording = `${
       questionType === 'capital'
-        ? `What is the capital of ${rightCountry.name}`
+        ? `What is the capital of ${rightCountry.name.common}`
         : questionType === 'name'
-        ? `Which country's capital is ${rightCountry.capital}`
+        ? `Which country's capital is ${rightCountry.capital[0]}`
         : questionType === 'flag'
         ? 'Which country’s flag is this'
-        : `What is the flag of ${rightCountry.name}`
+        : `What is the flag of ${rightCountry.name.common}`
     }?`;
-    const property = questionType === 'flag' ? 'name' : questionType;
-    let optionsToSet = [rightCountry[property]];
+    const rightAnswer = getAnswer(rightCountry, questionType);
+    let optionsToSet = [rightAnswer];
     for (let i = 0; i < 3; i++) {
-      const filteredCountries = countries.filter(country => !optionsToSet.includes(country[property]));
-      optionsToSet.push(filteredCountries[Math.floor(Math.random() * filteredCountries.length)][property]);
+      const filteredCountries = countries.filter(country => !optionsToSet.includes(getAnswer(country, questionType)));
+      const filteredCountry = filteredCountries[Math.floor(Math.random() * filteredCountries.length)];
+      optionsToSet.push(getAnswer(filteredCountry, questionType));
     }
     const options = optionsToSet.sort(() => Math.random() - 0.5);
-    const question = { questionType, wording, options, rightCountry };
+    const question = { questionType, wording, options, rightCountry, rightAnswer };
     dispatch({ type: 'PUT_QUESTION_TO_REDUCER', question });
     const total = first ? 1 : questionsAsked + 1;
     dispatch({ type: 'PUT_TOTAL_TO_REDUCER', questionsAsked: total });
@@ -81,7 +92,7 @@ function App({ dispatch, players, question, numberOfQuestions, questionsAsked })
   function checkGuess(e) {
     if (!guess) {
       setGuess(e.target.value);
-      if (e.target.value === rightAnswer) {
+      if (e.target.value === question.rightAnswer) {
         if (multiplayer) {
           dispatch({ type: 'INCREASE_SCORE', name });
         }
@@ -145,9 +156,9 @@ function App({ dispatch, players, question, numberOfQuestions, questionsAsked })
     if (inCharge && !countries.length) {
       fetch(endpoint)
         .then(blob => blob.json())
-        .then(data =>
-          setCountries([...data.filter(country => country.name.length && country.capital.length && country.alpha2Code)])
-        );
+        .then(data => {
+          setCountries([...data.filter(country => country.name.common && country.capital && country.cca2)])
+        });
     }
   }, [inCharge, countries]);
 
@@ -174,7 +185,6 @@ function App({ dispatch, players, question, numberOfQuestions, questionsAsked })
                   question={question}
                   checkGuess={checkGuess}
                   guess={guess}
-                  rightAnswer={rightAnswer}
                 />
                 {Boolean(questionsAsked) && (
                   <p className="score-container">

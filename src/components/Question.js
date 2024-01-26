@@ -1,7 +1,7 @@
 import React from 'react';
 
-function Question({ time, question, checkGuess, guess, rightAnswer }) {
-  const { questionType, wording, options, rightCountry } = question;
+function Question({ time, question, checkGuess, guess }) {
+  const { questionType, wording, options, rightCountry, rightAnswer } = question;
 
   return (
     <>
@@ -13,7 +13,7 @@ function Question({ time, question, checkGuess, guess, rightAnswer }) {
         )}
         {wording && <h3>{wording}</h3>}
         {questionType === 'flag' && (
-          <img src={`https://flagsapi.com/${rightCountry.alpha2Code.toUpperCase()}/flat/64.png`} alt="Mystery flag" />
+          <img src={`https://flagsapi.com/${rightCountry.cca2}/flat/64.png`} alt="Mystery flag" />
         )}
         <div>
           {options &&
@@ -26,8 +26,8 @@ function Question({ time, question, checkGuess, guess, rightAnswer }) {
                   guess && option === rightAnswer ? 'correct-answer' : guess === option ? 'wrong-answer' : ''
                 } option-button`}
               >
-                {questionType === 'alpha2Code' ? (
-                  <img src={`https://flagsapi.com/${option.toUpperCase()}/flat/64.png`} alt="Mystery flag" />
+                {questionType === 'cca2' ? (
+                  <img src={`https://flagsapi.com/${option}/flat/64.png`} alt="Mystery flag" />
                 ) : (
                   option
                 )}
